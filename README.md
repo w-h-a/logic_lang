@@ -17,9 +17,9 @@ All other operations also operate on the stack. The stack in mini-lang-3.js is u
 ## PUSH and POP ##
 
 - 'PUSH':
- - If a primitive value is pushed from the register, that value gets copied into every sub-stack.
- - If an array is pushed from the register, then 3 (shallow) copies of the array are made and all 4 arrays are placed into each sub-stack.
- - If an object (excludes arrays) is pushed from the register, then
+  - If a primitive value is pushed from the register, that value gets copied into every sub-stack.
+  - If an array is pushed from the register, then 3 (shallow) copies of the array are made and all 4 arrays are placed into each sub-stack.
+  - If an object (excludes arrays) is pushed from the register, then
     - first, it is ensured that the object has the two (shallow) primitive properties,
     - second, 3 (shallow) copies of the value are made,
     - third, for the 3 (shallow) copies the K property is determined by a random draw, and
@@ -30,11 +30,11 @@ All other operations also operate on the stack. The stack in mini-lang-3.js is u
   - If an object (includes arrays) is the topmost value of the topmost sub-stack,
     - the value is placed into the register, and
     - the value _and_ all of its counterparts are removed from each of the sub-stacks.
-  - If the topmost item of the topmost sub-stack is empty, `undefined` is placed into the register (i.e., it is possible to work with stacks with a length of 0).
+  - If the topmost item of the topmost sub-stack is empty, `undefined` is placed into the register (i.e., it is possible to work with stacks of length 0).
 
 ## Logical Operations for Topmost Item in the Topmost Sub-Stack ##
 
-
+- 'AND':
 
 
 AND: Pop a value off of the stack and check conjunction of Boolean(value) and Boolean(register), storing result in register.
