@@ -4,18 +4,18 @@ The program implements a sort of stack-and-register programming language for log
 
 A stack is a list of values that grows and shrinks. A stack-and-register programming language is a language that uses a stack of values. Each operation in the language operates on a register, which can be considered the current value. The register is not part of the stack. The register's value is initialized to `0`.
 
-Programs are supplied to the language via a string. Each of the operations detailed below is self-contained (i.e., operations are not operands of one another) and the syntax of the string argument is that each operation is in uppercase and separated by one whitespace. An object (includes arrays) in the language must use JSON syntax.
+Programs are supplied to the language via a string. Each of the operations detailed below is self-contained (i.e., operations are not operands of one another) and the syntax of the string input is such that each operation is in uppercase and separated by one whitespace (e.g., '5 PUSH NOT PRINT'). An object (includes arrays) in the language must use JSON syntax (e.g., '{"K": "nonconcrete","essential":{"R": "irrational","P":"non-person"}} PUSH ["blue",2,[]] PUSH [] PRINT').
 
 ## Register-only Operations ##
 
-- 'X': Place any stringified JS value, 'X', into the register.
+- 'X': Place any "stringified" JS value, 'X', into the register.
 
 - 'PRINT': Prints the boolean version of the register value.
-- 'NOT': Negates the register value.
-
-All other operations also operate on the stack. The stack in mini-lang-3.js is unique in that it is initialized to include 4 arrays of length 0, which might be thought of as sub-stacks. The stack always includes these 4 sub-stacks. Before listing out the other operations of mini-lang-3.js, it is important to point out that objects (excludes arrays) are treated specially in the language. There is one primitive property denoted by key 'K'. The K property is either 'concrete' (exclusive) or 'nonconcrete'. The user must specify the K property.
+- 'NOT': Negates the register value and returns the result to the register.
 
 ## PUSH and POP ##
+
+All other operations also operate on the stack. The stack in mini-lang-3.js is unique in that it is initialized to include _n_ arrays of length 0, which might be thought of as sub-stacks. The stack always includes these _n_ sub-stacks. Before listing out the other operations of mini-lang-3.js, it is important to point out that objects (excludes arrays) are treated specially in the language. There is one primitive property denoted by key 'K'. The K property is either 'concrete' (exclusive) or 'nonconcrete'. The user must specify the K property.
 
 - 'PUSH':
   - If a primitive value is pushed from the register, that value gets copied into every sub-stack. The value stays in the register.
@@ -132,7 +132,7 @@ All of the operations in the next section also perform a sort of popping operati
   - For the topmost sub-stack,
     - Check, `.every(ele => (typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0))` and
     - Store result in register
-- 'EVERY-NOT-OBJECT-EXISTS': (short for 'every value is either not an object, nor null, or empty')
+- 'EVERY-NOT-OBJECT-EXISTS': (short for 'every value is either not an object, null, or empty')
   - For the topmost sub-stack,
     - Check, `.every(ele => !(typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0))` and
     - Store result in register
@@ -140,10 +140,10 @@ All of the operations in the next section also perform a sort of popping operati
   - From the topmost sub-stack,
     - Check, `.every(ele => (typeof value === 'object' && ele !== null && value['K'] === 'concrete'))` and
     - Store result in register
-- 'EVERY-NOT-OBJECT-CONCRETE': (short for 'every value is either not an object, not null, or nonconcrete')
+- 'EVERY-NOT-OBJECT-CONCRETE': (short for 'every value is either not an object, null, or nonconcrete')
   - For the topmost sub-stack,
-  - Check `.every(ele => !(typeof value === 'object' && value['K'] === 'concrete'))`
-  - Store result in register
+    - Check `.every(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'concrete'))` and
+    - Store result in register
 - 'EVERY-PRIME-EXISTS':
   - From the topmost sub-stack,
     - Check `.every(ele => (typeof value !== 'object' && !Number.isNaN(value)))` and
@@ -160,30 +160,30 @@ The corresponding operations where 'EVERY' is replaced with 'SOME' are also avai
 - 'NEC-EVERY-OBJECT-CONCRETE': (short for 'necessarily, every value is a concrete, non-null object')
   - Check, `stack.every(sub => sub.every(ele => (typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
   - Store result in register
-- 'NEC-EVERY-NOT-OBJECT-CONCRETE': (short for 'necessarily, every value is not a concrete, non-null object')
+- 'NEC-EVERY-NOT-OBJECT-CONCRETE': (short for 'necessarily, every value is either not an object, null, or nonconcrete')
   - Check, `stack.every(sub => sub.every(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
   - Store result in register
 - 'NEC-SOME-OBJECT-CONCRETE': (short for 'necessarily, some value is a concrete, non-null object')
   - Check, `stack.every(sub => sub.some(ele => (typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
   - Store result in register
-- 'NEC-SOME-NOT-OBJECT-CONCRETE': (short for 'necessarily, some value is not a concrete, non-null object')
+- 'NEC-SOME-NOT-OBJECT-CONCRETE': (short for 'necessarily, some value is either not an object, null, or nonconcrete')
   - Check, `stack.every(sub => sub.some(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
   - Store result in register
 
 - 'POS-EVERY-OBJECT-CONCRETE': (short for 'possibly, every value is a concrete, non-null object')
   - Check, `stack.some(sub => sub.every(ele => (typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
   - Store result in register
-- 'POS-EVERY-NOT-OBJECT-CONCRETE': (short for 'possibly, every value is not a concrete, non-null object')
+- 'POS-EVERY-NOT-OBJECT-CONCRETE': (short for 'possibly, every value is either not an object, null, or nonconcrete')
   - Check, `stack.some(sub => sub.every(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
   - Store result in register
 - 'POS-SOME-OBJECT-CONCRETE': (short for 'possibly, some value is a concrete, non-null object')
   - Check, `stack.some(sub => sub.some(ele => (typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
   - Store result in register
-- 'POS-SOME-NOT-OBJECT-CONCRETE': (short for 'possibly, some value is not a concrete, non-null object')
+- 'POS-SOME-NOT-OBJECT-CONCRETE': (short for 'possibly, some value is either not an object, null, or nonconcrete')
   - Check, `stack.some(sub => sub.some(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
   - Store result in register
 
-Given the way the program is structured, it is interesting to point out that if any of the operations beginning with 'POS' return true, then the corresponding 'NEC' operation will return true. That was intended but also a result of the fact that I don't know how to model an object x in each stack but where x has different properties in each stack.
+Given the way the program is structured, it is interesting to point out that if any of the operations beginning with 'POS' return true, then the corresponding 'NEC' operation will return true. That was intended but also a result of the fact that I don't know how to model an object x in each stack such that x has different properties in each stack.
 
 
 
