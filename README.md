@@ -9,20 +9,25 @@ Programs are supplied to the language via a string. Each of the operations detai
 ## Register-only Operations ##
 
 - 'X': Place any stringified JS value, 'X', into the register.
+
 - 'PRINT': Prints the boolean version of the register value.
 - 'NOT': Negates the register value.
 
-All other operations also operate on the stack. The stack in mini-lang-3.js is unique in that it is initialized to include 4 arrays of length 0, which might be thought of as sub-stacks. The stack always includes these 4 sub-stacks. Before listing out the other operations of mini-lang-3.js, it is important to point out that objects (including arrays) are treated specially in the language. There are two primitive properties denoted by keys 'K' and 'N', respectively. The K property is either 'concrete' (exclusive) or 'nonconcrete' and the N property corresponds to the object's sub-stack number. The user cannot specify the N property, and if the user does not specify the K property, it will be determined by a random draw.
+All other operations also operate on the stack. The stack in mini-lang-3.js is unique in that it is initialized to include 4 arrays of length 0, which might be thought of as sub-stacks. The stack always includes these 4 sub-stacks. Before listing out the other operations of mini-lang-3.js, it is important to point out that objects (excludes arrays) are treated specially in the language. There is one primitive property denoted by key 'K'. The K property is either 'concrete' (exclusive) or 'nonconcrete'. The user must specify the K property.
 
 ## PUSH and POP ##
 
 - 'PUSH':
-  - If a primitive value is pushed from the register, that value gets copied into every sub-stack.
-  - If an object (includes arrays) is pushed from the register, then
+  - If a primitive value is pushed from the register, that value gets copied into every sub-stack. The value stays in the register.
+  - If an array is pushed from the register, then
     - first, 3 (shallow) copies of the value are made,
-    - second, the N property is determined by which copy the object is (2, 3, 4); the original's N property is assigned the value of 1,
-    - third, for the 3 (shallow) copies the K property is determined by a random draw; the original's K property is assigned the value of user's input or by random draw, and
-    - fourth, all 4 arrays are placed into each sub-stack.
+    - second, all 4 arrays are placed into each sub-stack, and
+    - third, the original value also remains in the register.
+  - If an object (excludes arrays) is pushed from the register, then
+    - first, 3 (shallow) copies of the value are made,
+    - second, the K property is determined by user's input, and
+    - third, all 4 arrays are placed into each sub-stack.
+    - fourth, the original value also remains in the register.
 - 'POP':
   - If a primitive value is the topmost value of the topmost sub-stack, the value is removed from each of the sub-stacks and placed into the register.
   - If an object (includes arrays) is the topmost value of the topmost sub-stack,
@@ -38,116 +43,147 @@ All of the operations in the next section also perform a sort of popping operati
 
 ## Logical Operations for Topmost Item in the Topmost Sub-Stack ##
 
-- 'AND': From the topmost sub-stack,
-  - Pop off the topmost value,
-  - Check `Boolean(value) && Boolean(register)`, and
-  - Store result in register
-- 'OR': From the topmost sub-stack,
-  - Pop off the topmost value,
-  - Check `Boolean(value) || Boolean(register)`, and
-  - Store result in register
-- 'CON': (short for 'conditional') From the topmost sub-stack,
-  - Pop off the topmost value,
-  - Check `!Boolean(value) || Boolean(register)`, and
-  - Store result in register
-- 'BCON': (short for 'bi-conditional') From the topmost sub-stack,
-  - Pop off the topmost value,
-  - Check `Boolean(value) ? Boolean(register) : !Boolean(register)`, and
-  - Store result in register
+- 'AND':
+  - From the topmost sub-stack,
+    - Pop off the topmost value,
+    - Check `Boolean(value) && Boolean(register)`, and
+    - Store result in register
+- 'OR':
+  - From the topmost sub-stack,
+    - Pop off the topmost value,
+    - Check `Boolean(value) || Boolean(register)`, and
+    - Store result in register
+- 'CON': (short for 'conditional')
+  - From the topmost sub-stack,
+    - Pop off the topmost value,
+    - Check `!Boolean(value) || Boolean(register)`, and
+    - Store result in register
+- 'BCON': (short for 'bi-conditional')
+  - From the topmost sub-stack,
+    - Pop off the topmost value,
+    - Check `Boolean(value) ? Boolean(register) : !Boolean(register)`, and
+    - Store result in register
 
-- 'ID': From the topmost sub-stack,
-  - Pop off the topmost value,
-  - Check `value === register`, and
-  - Store result in register
-- 'OBJECT-EXISTS': (short for 'value is a non-empty object') From the topmost sub-stack,
-  - Pop off the topmost value,
-  - Check `(typeof value === 'object' && Object.keys(value)['length'] > 0)`, and
-  - Store result in register
-- 'OBJECT-CONCRETE': (short for 'value is a concrete object') From the topmost sub-stack,
-  - Pop off the topmost value,
-  - Check `(typeof value === 'object' && value['K'] === 'concrete')`, and
-  - Store result in register
-- 'OBJECT-REPS-AT-1': (short for 'value is an object that represents an object from the perspective of the topmost sub-stack') From the topmost sub-stack,
-  - Pop off the topmost value,
-  - Check `(typeof value === 'object' && value['N'] === 1)`, and
-  - Store result in register
-- 'PRIME-EXISTS': (short for 'value is neither an object nor `NaN`) From the topmost sub-stack,
-  - Pop off the topmost value,
-  - Check `(typeof value !== 'object' && !Number.isNaN(value))`, and
-  - Store result in register
+- 'ID':
+  - From the topmost sub-stack,
+    - Pop off the topmost value,
+    - Check `value === register`, and
+    - Store result in register
+- 'OBJECT-EXISTS': (short for 'value is a non-empty, non-null object')
+  - From the topmost sub-stack,
+    - Pop off the topmost value,
+    - Check `(typeof value === 'object' && value !== null && Object.keys(value)['length'] > 0)`, and
+    - Store result in register
+- 'OBJECT-CONCRETE': (short for 'value is a concrete, non-null object')
+  - From the topmost sub-stack,
+    - Pop off the topmost value,
+    - Check `(typeof value === 'object' && value !== null && value['K'] === 'concrete')`, and
+    - Store result in register
+- 'PRIME-EXISTS': (short for 'value is neither an object nor `NaN`)
+  - From the topmost sub-stack,
+    - Pop off the topmost value,
+    - Check `(typeof value !== 'object' && !Number.isNaN(value))`, and
+    - Store result in register
 
 ## Logical Operations Across All Items in the Topmost Sub-Stack ##
 
-- 'EVERY-AND': For the topmost sub-stack,
-  - Check, `.every(ele => (Boolean(ele) && Boolean(register)))` and
+- 'EVERY-AND':
+  - For the topmost sub-stack,
+    - Check, `.every(ele => (Boolean(ele) && Boolean(register)))` and
+    - Store result in register
+- 'EVERY-NOT-AND':
+  - For the topmost sub-stack,
+    - Check, `.every(ele => !(Boolean(ele) && Boolean(register)))` and
+    - Store result in register
+- 'EVERY-OR':
+  - For the topmost sub-stack,
+    - Check, `.every(ele => (Boolean(ele) || Boolean(register)))` and
+    - Store result in register
+- 'EVERY-NOT-OR':
+  - For the topmost sub-stack,
+    - Check, `.every(ele => !(Boolean(ele) || Boolean(register)))` and
+    - Store result in register
+- 'EVERY-CON':
+  - For the topmost sub-stack,
+    - Check, `.every(ele => (!Boolean(ele) || Boolean(register)))` and
+    - Store result in register
+- 'EVERY-NOT-CON':
+  - For the topmost sub-stack,
+    - Check, `.every(ele => !(!Boolean(ele) || Boolean(register)))` and
+    - Store result in register
+- 'EVERY-BCON':
+  - For the topmost sub-stack,
+    - Check, `.every(ele => (Boolean(ele) ? Boolean(register) : !Boolean(register)))` and
   - Store result in register
-- 'EVERY-NOT-AND': For the topmost sub-stack,
-  - Check, `.every(ele => !(Boolean(ele) && Boolean(register)))` and
-  - Store result in register
-- 'EVERY-OR': For the topmost sub-stack,
-  - Check, `.every(ele => (Boolean(ele) || Boolean(register)))` and
-  - Store result in register
-- 'EVERY-NOT-OR': For the topmost sub-stack,
-  - Check, `.every(ele => !(Boolean(ele) || Boolean(register)))` and
-  - Store result in register
-- 'EVERY-CON': For the topmost sub-stack,
-  - Check, `.every(ele => (!Boolean(ele) || Boolean(register)))` and
-  - Store result in register
-- 'EVERY-NOT-CON': For the topmost sub-stack,
-  - Check, `.every(ele => !(!Boolean(ele) || Boolean(register)))` and
-  - Store result in register
-- 'EVERY-BCON': For the topmost sub-stack,
-  - Check, `.every(ele => (Boolean(ele) ? Boolean(register) : !Boolean(register)))` and
-  - Store result in register
-- 'EVERY-NOT-BCON': For the topmost sub-stack,
-  - Check, `.every(ele => !(Boolean(ele) ? Boolean(register) : !Boolean(register)))` and
-  - Store result in register
+- 'EVERY-NOT-BCON':
+  - For the topmost sub-stack,
+    - Check, `.every(ele => !(Boolean(ele) ? Boolean(register) : !Boolean(register)))` and
+    - Store result in register
 
-- 'EVERY-ID': For the topmost sub-stack,
-  - Check, `.every(ele => ele === register)` and
-  - Store result in register
-- 'EVERY-NOT-ID': For the topmost sub-stack,
-  - Check, `.every(ele => ele !== register)` and
-  - Store result in register
-- 'EVERY-OBJECT-EXISTS': For the topmost sub-stack,
-  - Check, `.every(ele => (typeof ele === 'object' && Object.keys(ele)['length'] > 0))` and
-  - Store result in register
-- 'EVERY-NOT-OBJECT-EXISTS': (short for 'every value is either not an object or empty'*) For the topmost sub-stack,
-  - Check, `.every(ele => !(typeof ele === 'object' && Object.keys(ele)['length'] > 0))` and
-  - Store result in register
-- 'EVERY-OBJECT-CONCRETE': From the topmost sub-stack,
-  - Check, `.every(ele => (typeof value === 'object' && value['K'] === 'concrete'))` and
-  - Store result in register
-- 'EVERY-NOT-OBJECT-CONCRETE': (short for 'every value is either not an object or nonconcrete') For the topmost sub-stack,
+- 'EVERY-ID':
+  - For the topmost sub-stack,
+    - Check, `.every(ele => ele === register)` and
+    - Store result in register
+- 'EVERY-NOT-ID':
+  - For the topmost sub-stack,
+    - Check, `.every(ele => ele !== register)` and
+    - Store result in register
+- 'EVERY-OBJECT-EXISTS':
+  - For the topmost sub-stack,
+    - Check, `.every(ele => (typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0))` and
+    - Store result in register
+- 'EVERY-NOT-OBJECT-EXISTS': (short for 'every value is either not an object, nor null, or empty')
+  - For the topmost sub-stack,
+    - Check, `.every(ele => !(typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0))` and
+    - Store result in register
+- 'EVERY-OBJECT-CONCRETE':
+  - From the topmost sub-stack,
+    - Check, `.every(ele => (typeof value === 'object' && ele !== null && value['K'] === 'concrete'))` and
+    - Store result in register
+- 'EVERY-NOT-OBJECT-CONCRETE': (short for 'every value is either not an object, not null, or nonconcrete')
+  - For the topmost sub-stack,
   - Check `.every(ele => !(typeof value === 'object' && value['K'] === 'concrete'))`
   - Store result in register
-- 'EVERY-PRIME-EXISTS': From the topmost sub-stack,
-  - Check `.every(typeof value !== 'object' && !Number.isNaN(value))` and
-  - Store result in register
-- 'EVERY-NOT-PRIME-EXISTS': (short for 'every value is either an object or `NaN`') From the topmost sub-stack,
-  - Check `.every(typeof value !== 'object' && !Number.isNaN(value))` and
-  - Store result in register
+- 'EVERY-PRIME-EXISTS':
+  - From the topmost sub-stack,
+    - Check `.every(ele => (typeof value !== 'object' && !Number.isNaN(value)))` and
+    - Store result in register
+- 'EVERY-NOT-PRIME-EXISTS': (short for 'every value is either an object or `NaN`')
+  - From the topmost sub-stack,
+    - Check `.every(ele => !(typeof value !== 'object' && !Number.isNaN(value)))` and
+    - Store result in register
 
 The corresponding operations where 'EVERY' is replaced with 'SOME' are also available.
 
-*Because of the way the language works, necessarily, every object is non-empty; so, this can be rendered as 'every value is not an object'.
-
 ## Logical Operations Across All Sub-Stacks ##
 
+- 'NEC-EVERY-OBJECT-CONCRETE': (short for 'necessarily, every value is a concrete, non-null object')
+  - Check, `stack.every(sub => sub.every(ele => (typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
+  - Store result in register
+- 'NEC-EVERY-NOT-OBJECT-CONCRETE': (short for 'necessarily, every value is not a concrete, non-null object')
+  - Check, `stack.every(sub => sub.every(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
+  - Store result in register
+- 'NEC-SOME-OBJECT-CONCRETE': (short for 'necessarily, some value is a concrete, non-null object')
+  - Check, `stack.every(sub => sub.some(ele => (typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
+  - Store result in register
+- 'NEC-SOME-NOT-OBJECT-CONCRETE': (short for 'necessarily, some value is not a concrete, non-null object')
+  - Check, `stack.every(sub => sub.some(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
+  - Store result in register
 
+- 'POS-EVERY-OBJECT-CONCRETE': (short for 'possibly, every value is a concrete, non-null object')
+  - Check, `stack.some(sub => sub.every(ele => (typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
+  - Store result in register
+- 'POS-EVERY-NOT-OBJECT-CONCRETE': (short for 'possibly, every value is not a concrete, non-null object')
+  - Check, `stack.some(sub => sub.every(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
+  - Store result in register
+- 'POS-SOME-OBJECT-CONCRETE': (short for 'possibly, some value is a concrete, non-null object')
+  - Check, `stack.some(sub => sub.some(ele => (typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
+  - Store result in register
+- 'POS-SOME-NOT-OBJECT-CONCRETE': (short for 'possibly, some value is not a concrete, non-null object')
+  - Check, `stack.some(sub => sub.some(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'concrete')))` and
+  - Store result in register
 
-
-
-
-
-
-
-
-
-
-
-
-
+Given the way the program is structured, it is interesting to point out that if any of the operations beginning with 'POS' return true, then the corresponding 'NEC' operation will return true. That was intended but also a result of the fact that I don't know how to model an object x in each stack but where x has different properties in each stack.
 
 
 
