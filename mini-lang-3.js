@@ -80,7 +80,7 @@ function toPush(accParam, stackParam) {
     let copiesAndOriginal = stackParam.map((ele, idx) => (idx === 0 ? accParam : accParam.slice())).reverse();
     stackParam.forEach(sub => sub.push(...copiesAndOriginal));
   } else {
-    let counterpartsAndOriginal = stackParam.map((ele, idx) => (idx === 0 ? accParam : Object.assign({}, accParam)).reverse();
+    let counterpartsAndOriginal = stackParam.map((ele, idx) => (idx === 0 ? accParam : Object.assign({}, accParam))).reverse();
     stackParam.forEach((sub, idx) => {
       let k = getUserInput(`For object ${idx + 1}, enter 'Y' for CONCRETE or anything else for NONCONCRETE`) === 'Y';
       if (k) {
@@ -97,7 +97,7 @@ function toPop(stackParam) {
   let result;
 
   stackParam.forEach((sub, idx) => {
-    if (idx !== stackParam[stackParam['length'] - 1]) {
+    if (idx !== (stackParam['length'] - 1)) {
       if (sub[sub['length'] - 1] === null || typeof sub[sub['length'] - 1] !== 'object') {
         sub.pop();
       } else if (typeof sub[sub['length'] - 1] === 'object') {
@@ -132,75 +132,108 @@ function performLogic(accParam, eleParam, stackParam) {
     accParam = !Boolean(leftOperand) || Boolean(accParam);
   } else if (eleParam === 'BCON') {
     let leftOperand = toPop(stackParam);
-    accParam = Boolean(value) ? Boolean(accParam) : !Boolean(accParam);
-  }
-
-
-
-  - 'ID':
-    - From the topmost sub-stack,
-      - Pop off the topmost value,
-      - Check `value === register`, and
-      - Store result in register
-  - 'OBJECT-EXISTS': (short for 'value is a non-empty, non-null object')
-    - From the topmost sub-stack,
-      - Pop off the topmost value,
-      - Check `(typeof value === 'object' && value !== null && Object.keys(value)['length'] > 0)`, and
-      - Store result in register
-  - 'OBJECT-CONCRETE': (short for 'value is a concrete, non-null object')
-    - From the topmost sub-stack,
-      - Pop off the topmost value,
-      - Check `(typeof value === 'object' && value !== null && value['K'] === 'CONCRETE')`, and
-      - Store result in register
-  - 'PRIME-EXISTS': (short for 'value is neither an object nor `NaN`)
-    - From the topmost sub-stack,
-      - Pop off the topmost value,
-      - Check `(typeof value !== 'object' && !Number.isNaN(value))`, and
-      - Store result in register
-
-
-
-
-  else if (eleParam === 'EVERY-AND') {
-    accParam = stackParam.every(ele => (Boolean(ele) && Boolean(accParam)));
+    accParam = Boolean(leftOperand) ? Boolean(accParam) : !Boolean(accParam);
+  } else if (eleParam === 'ID') {
+    let leftOperand = toPop(stackParam);
+    accParam = leftOperand === accParam;
+  } else if (eleParam === 'OBJECT-EXISTS') {
+    let operand = toPop(stackParam);
+    accParam = (typeof operand === 'object' && operand !== null && Object.keys(operand)['length'] > 0);
+  } else if (eleParam === 'OBJECT-CONCRETE') {
+    let operand = toPop(stackParam);
+    accParam = (typeof operand === 'object' && operand !== null && operand['K'] === 'CONCRETE');
+  } else if (eleParam === 'PRIME-EXISTS') {
+    let operand = toPop(stackParam);
+    accParam = (typeof operand !== 'object' && !Number.isNaN(operand));
+  } else if (eleParam === 'EVERY-AND') {
+    accParam = stackParam[stackParam['length'] - 1].every(ele => (Boolean(ele) && Boolean(accParam)));
   } else if (eleParam === 'EVERY-NOT-AND') {
-    accParam = stackParam.every(ele => !(Boolean(ele) && Boolean(accParam)));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => !(Boolean(ele) && Boolean(accParam)));
   } else if (eleParam === 'EVERY-OR') {
-    accParam = stackParam.every(ele => (Boolean(ele) || Boolean(accParam)));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => (Boolean(ele) || Boolean(accParam)));
   } else if (eleParam === 'EVERY-NOT-OR') {
-    accParam = stackParam.every(ele => !(Boolean(ele) || Boolean(accParam)));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => !(Boolean(ele) || Boolean(accParam)));
   } else if (eleParam === 'EVERY-CON') {
-    accParam = stackParam.every(ele => (Boolean(!ele) || Boolean(accParam)));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => (Boolean(!ele) || Boolean(accParam)));
   } else if (eleParam === 'EVERY-NOT-CON') {
-    accParam = stackParam.every(ele => !(Boolean(!ele) || Boolean(accParam)));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => !(Boolean(!ele) || Boolean(accParam)));
   } else if (eleParam === 'EVERY-BCON') {
-    accParam = stackParam.every(ele => (Boolean(ele) ? Boolean(accParam) : Boolean(!accParam)));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => (Boolean(ele) ? Boolean(accParam) : Boolean(!accParam)));
   } else if (eleParam === 'EVERY-NOT-BCON') {
-    accParam = stackParam.every(ele => !(Boolean(ele) ? Boolean(accParam) : Boolean(!accParam)));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => !(Boolean(ele) ? Boolean(accParam) : Boolean(!accParam)));
   } else if (eleParam === 'EVERY-ID') {
-    accParam = stackParam.every(ele => ele === accParam);
+    accParam = stackParam[stackParam['length'] - 1].every(ele => ele === accParam);
   } else if (eleParam === 'EVERY-NOT-ID') {
-    accParam = stackParam.every(ele => ele !== accParam);
+    accParam = stackParam[stackParam['length'] - 1].every(ele => ele !== accParam);
   } else if (eleParam === 'EVERY-OBJECT-EXISTS') {
-    accParam = stackParam.every(ele => (typeof ele === 'object' && Object.keys(ele)['length'] > 0));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => (typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0));
   } else if (eleParam === 'EVERY-NOT-OBJECT-EXISTS') {
-    accParam = stackParam.every(ele => !(typeof ele === 'object' && Object.keys(ele)['length'] > 0));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => !(typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0));
   } else if (eleParam === 'EVERY-OBJECT-CONCRETE') {
-    accParam = stackParam.every(ele => (typeof ele === 'object' && ele['K'] === 'concrete'));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => (typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE'));
   } else if (eleParam === 'EVERY-NOT-OBJECT-CONCRETE') {
-    accParam = stackParam.every(ele => !(typeof value === 'object' && value['K'] === 'concrete'));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'CONCRETE'));
   } else if (eleParam === 'EVERY-PRIME-EXISTS') {
-    accParam = stackParam.every(ele => (typeof ele !== 'object' && !Number.isNaN(ele)));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => (typeof ele !== 'object' && !Number.isNaN(ele)));
   } else if (eleParam === 'EVERY-NOT-PRIME-EXISTS') {
-    accParam = stackParam.every(ele => !(typeof ele !== 'object' && !Number.isNaN(ele)));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => !(typeof ele !== 'object' && !Number.isNaN(ele)));
+  } else if (eleParam === 'SOME-AND') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => (Boolean(ele) && Boolean(accParam)));
+  } else if (eleParam === 'SOME-NOT-AND') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => !(Boolean(ele) && Boolean(accParam)));
+  } else if (eleParam === 'SOME-OR') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => (Boolean(ele) || Boolean(accParam)));
+  } else if (eleParam === 'SOME-NOT-OR') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => !(Boolean(ele) || Boolean(accParam)));
+  } else if (eleParam === 'SOME-CON') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => (Boolean(!ele) || Boolean(accParam)));
+  } else if (eleParam === 'SOME-NOT-CON') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => !(Boolean(!ele) || Boolean(accParam)));
+  } else if (eleParam === 'SOME-BCON') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => (Boolean(ele) ? Boolean(accParam) : Boolean(!accParam)));
+  } else if (eleParam === 'SOME-NOT-BCON') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => !(Boolean(ele) ? Boolean(accParam) : Boolean(!accParam)));
+  } else if (eleParam === 'SOME-ID') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => ele === accParam);
+  } else if (eleParam === 'SOME-NOT-ID') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => ele !== accParam);
+  } else if (eleParam === 'SOME-OBJECT-EXISTS') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => (typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0));
+  } else if (eleParam === 'SOME-NOT-OBJECT-EXISTS') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => !(typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0));
+  } else if (eleParam === 'SOME-OBJECT-CONCRETE') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => (typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE'));
+  } else if (eleParam === 'SOME-NOT-OBJECT-CONCRETE') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'CONCRETE'));
+  } else if (eleParam === 'SOME-PRIME-EXISTS') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => (typeof ele !== 'object' && !Number.isNaN(ele)));
+  } else if (eleParam === 'SOME-NOT-PRIME-EXISTS') {
+    accParam = stackParam[stackParam['length'] - 1].some(ele => !(typeof ele !== 'object' && !Number.isNaN(ele)));
+  } else if (eleParam === 'NEC-EVERY-OBJECT-CONCRETE') {
+    accParam = stackParam.every(sub => sub.every(ele => (typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE')));
+  } else if (eleParam === 'NEC-EVERY-NOT-OBJECT-CONCRETE') {
+    accParam = stackParam.every(sub => sub.every(ele => !(typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE')));
+  } else if (eleParam === 'NEC-SOME-OBJECT-CONCRETE') {
+    accParam = stackParam.every(sub => sub.some(ele => (typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE')));
+  } else if (eleParam === 'NEC-SOME-NOT-OBJECT-CONCRETE') {
+    accParam = stackParam.every(sub => sub.some(ele => !(typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE')));
+  } else if (eleParam === 'POS-EVERY-OBJECT-CONCRETE') {
+    accParam = stackParam.some(sub => sub.every(ele => (typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE')));
+  } else if (eleParam === 'POS-EVERY-NOT-OBJECT-CONCRETE') {
+    accParam = stackParam.some(sub => sub.every(ele => !(typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE')));
+  } else if (eleParam === 'POS-SOME-OBJECT-CONCRETE') {
+    accParam = stackParam.some(sub => sub.some(ele => (typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE')));
+  } else if (eleParam === 'POS-SOME-NOT-OBJECT-CONCRETE') {
+    accParam = stackParam.some(sub => sub.some(ele => !(typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE')));
   }
+
   return accParam;
 }
 
 do {
   console.clear();
   if (toWelcome) {
-    console.log('Welcome to JS Logic!'');
+    console.log('Welcome to JS Logic!');
     toWelcome = false;
   }
 
