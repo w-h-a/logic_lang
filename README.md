@@ -1,6 +1,6 @@
 # README #
 
-The program implements a sort of stack-and-register programming language for logical operations in JavaScript. The program is inspired by a stack machine problem that I had to solve for Launch School's JS foundations course. Some of the material below comes from Launch School.
+The program in mini-lang-3.js implements a sort of stack-and-register programming language for logical operations in JavaScript. The program is inspired by a stack machine problem that I had to solve for Launch School's JS foundations course. Some of the material below comes from Launch School.
 
 A stack is a list of values that grows and shrinks. A stack-and-register programming language is a language that uses a stack of values. Each operation in the language operates on a register, which can be considered the current value. The register is not part of the stack. The register's value is initialized to `0`.
 
@@ -18,18 +18,18 @@ Programs are supplied to the language via a string. Each of the operations detai
 All other operations also operate on the stack. The stack in mini-lang-3.js is unique in that it is initialized to include _n_ arrays of length 0, which might be thought of as sub-stacks. The stack always includes these _n_ sub-stacks. Before listing out the other operations of mini-lang-3.js, it is important to point out that objects (excludes arrays) are treated specially in the language. There is one primitive property denoted by key 'K'. The K property is either 'CONCRETE' (exclusive) or 'NONCONCRETE'. The user must specify the K property.
 
 - 'PUSH':
-  - If a primitive value is pushed from the register, that value gets copied into every sub-stack. The value stays in the register.
+  - If a null or primitive value is pushed from the register, that value gets copied into every sub-stack. The value stays in the register.
   - If an array is pushed from the register, then
-    - first, 3 (shallow) copies of the value are made,
-    - second, all 4 arrays are placed into each sub-stack, and
+    - first, _n - 1_ (shallow) copies of the value are made,
+    - second, all _n_ arrays are placed into each sub-stack, and
     - third, the original value also remains in the register.
   - If an object (excludes arrays) is pushed from the register, then
-    - first, 3 (shallow) copies of the value are made,
+    - first, _n - 1_ (shallow) copies of the value are made,
     - second, the K property is determined by user's input, and
-    - third, all 4 arrays are placed into each sub-stack.
+    - third, all _n_ arrays are placed into each sub-stack.
     - fourth, the original value also remains in the register.
 - 'POP':
-  - If a primitive value is the topmost value of the topmost sub-stack, the value is removed from each of the sub-stacks and placed into the register.
+  - If a null or primitive value is the topmost value of the topmost sub-stack, the value is removed from each of the sub-stacks and placed into the register.
   - If an object (includes arrays) is the topmost value of the topmost sub-stack,
     - the value is placed into the register, and
     - the value _and_ all of its counterparts are removed from each of the sub-stacks.

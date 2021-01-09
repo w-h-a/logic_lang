@@ -74,34 +74,103 @@ function parseRegister(accParam, eleParam) {
 }
 
 function toPush(accParam, stackParam) {
-
+  if (accParam === null || typeof accParam !== 'object') {
+    stackParam.forEach(sub => sub.push(accParam));
+  } else if (Array.isArray(accParam)) {
+    let copiesAndOriginal = stackParam.map((ele, idx) => (idx === 0 ? accParam : accParam.slice())).reverse();
+    stackParam.forEach(sub => sub.push(...copiesAndOriginal));
+  } else {
+    let counterpartsAndOriginal = stackParam.map((ele, idx) => (idx === 0 ? accParam : Object.assign({}, accParam)).reverse();
+    stackParam.forEach((sub, idx) => {
+      let k = getUserInput(`For object ${idx + 1}, enter 'Y' for CONCRETE or anything else for NONCONCRETE`) === 'Y';
+      if (k) {
+        counterpartsAndOriginal[idx]['K'] = 'CONCRETE';
+      } else {
+        counterpartsAndOriginal[idx]['K'] = 'NONCONCRETE';
+      }
+      sub.push(...counterpartsAndOriginal);
+    });
+  }
 }
 
 function toPop(stackParam) {
+  let result;
 
+  stackParam.forEach((sub, idx) => {
+    if (idx !== stackParam[stackParam['length'] - 1]) {
+      if (sub[sub['length'] - 1] === null || typeof sub[sub['length'] - 1] !== 'object') {
+        sub.pop();
+      } else if (typeof sub[sub['length'] - 1] === 'object') {
+        stackParam.forEach((ele, jdx) => sub.pop());
+      }
+    } else {
+      if (sub['length'] === 0 || sub[sub['length'] - 1] === null || typeof sub[sub['length'] - 1] !== 'object') {
+        result = sub.pop();
+      } else if (typeof sub[sub['length'] - 1] === 'object') {
+        stackParam.forEach((ele, jdx) => {
+          if (jdx === 0) {
+            result = sub.pop();
+          }
+          sub.pop();
+        });
+      }
+    }
+  });
+
+  return result;
 }
+
+
+
 
 function performLogic(accParam, eleParam, stackParam) {
   if (eleParam === 'AND') {
-    accParam = Boolean(stackParam.pop()) && Boolean(accParam);
-  } else if (eleParam === 'OR') {
-    accParam = Boolean(stackParam.pop()) || Boolean(accParam);
-  } else if (eleParam === 'CON') {
-    accParam = Boolean(!stackParam.pop()) || Boolean(accParam);
-  } else if (eleParam === 'BCON') {
-    accParam = Boolean(stackParam.pop()) ? Boolean(accParam) : Boolean(!accParam);
-  } else if (eleParam === 'ID') {
-    accParam = stackParam.pop() === accParam;
-  } else if (eleParam === 'OBJECT-EXISTS') {
-    let value = stackParam.pop();
-    accParam = (typeof value === 'object' && Object.keys(value)['length'] > 0);
-  } else if (eleParam === 'OBJECT-CONCRETE') {
-    let value = stackParam.pop();
-    accParam = (typeof value === 'object' && value['K'] === 'concrete');
-  } else if (eleParam === 'PRIME-EXISTS') {
-    let value = stackParam.pop();
-    accParam = (typeof value !== 'object' && Number.isNaN(value));
-  } else if (eleParam === 'EVERY-AND') {
+    let leftOperand = toPop(stackParam);
+    accParam = Boolean(leftOperand) && Boolean(accParam);
+  }
+
+
+  - 'OR':
+    - From the topmost sub-stack,
+      - Pop off the topmost value,
+      - Check `Boolean(value) || Boolean(register)`, and
+      - Store result in register
+  - 'CON': (short for 'conditional')
+    - From the topmost sub-stack,
+      - Pop off the topmost value,
+      - Check `!Boolean(value) || Boolean(register)`, and
+      - Store result in register
+  - 'BCON': (short for 'bi-conditional')
+    - From the topmost sub-stack,
+      - Pop off the topmost value,
+      - Check `Boolean(value) ? Boolean(register) : !Boolean(register)`, and
+      - Store result in register
+
+  - 'ID':
+    - From the topmost sub-stack,
+      - Pop off the topmost value,
+      - Check `value === register`, and
+      - Store result in register
+  - 'OBJECT-EXISTS': (short for 'value is a non-empty, non-null object')
+    - From the topmost sub-stack,
+      - Pop off the topmost value,
+      - Check `(typeof value === 'object' && value !== null && Object.keys(value)['length'] > 0)`, and
+      - Store result in register
+  - 'OBJECT-CONCRETE': (short for 'value is a concrete, non-null object')
+    - From the topmost sub-stack,
+      - Pop off the topmost value,
+      - Check `(typeof value === 'object' && value !== null && value['K'] === 'CONCRETE')`, and
+      - Store result in register
+  - 'PRIME-EXISTS': (short for 'value is neither an object nor `NaN`)
+    - From the topmost sub-stack,
+      - Pop off the topmost value,
+      - Check `(typeof value !== 'object' && !Number.isNaN(value))`, and
+      - Store result in register
+
+
+
+
+  else if (eleParam === 'EVERY-AND') {
     accParam = stackParam.every(ele => (Boolean(ele) && Boolean(accParam)));
   } else if (eleParam === 'EVERY-NOT-AND') {
     accParam = stackParam.every(ele => !(Boolean(ele) && Boolean(accParam)));
