@@ -120,31 +120,22 @@ function toPop(stackParam) {
   return result;
 }
 
-
-
-
 function performLogic(accParam, eleParam, stackParam) {
   if (eleParam === 'AND') {
     let leftOperand = toPop(stackParam);
     accParam = Boolean(leftOperand) && Boolean(accParam);
+  } else if (eleParam === 'OR') {
+    let leftOperand = toPop(stackParam);
+    accParam = Boolean(leftOperand) || Boolean(accParam);
+  } else if (eleParam === 'CON') {
+    let leftOperand = toPop(stackParam);
+    accParam = !Boolean(leftOperand) || Boolean(accParam);
+  } else if (eleParam === 'BCON') {
+    let leftOperand = toPop(stackParam);
+    accParam = Boolean(value) ? Boolean(accParam) : !Boolean(accParam);
   }
 
 
-  - 'OR':
-    - From the topmost sub-stack,
-      - Pop off the topmost value,
-      - Check `Boolean(value) || Boolean(register)`, and
-      - Store result in register
-  - 'CON': (short for 'conditional')
-    - From the topmost sub-stack,
-      - Pop off the topmost value,
-      - Check `!Boolean(value) || Boolean(register)`, and
-      - Store result in register
-  - 'BCON': (short for 'bi-conditional')
-    - From the topmost sub-stack,
-      - Pop off the topmost value,
-      - Check `Boolean(value) ? Boolean(register) : !Boolean(register)`, and
-      - Store result in register
 
   - 'ID':
     - From the topmost sub-stack,
