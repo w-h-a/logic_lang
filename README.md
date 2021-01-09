@@ -66,13 +66,13 @@ All of the operations in the next section also perform a sort of popping operati
 
 Examples:
 
-'<any value> PUSH CON PRINT' // => true
-'<truthy value> PUSH <any value> OR PRINT' // => true
-'<truthy value> NOT PUSH <any value> CON PRINT' // => true
-'<any value> PUSH <truthy value> CON PRINT' // => true
-'<falsy value> PUSH <any value> CON PRINT' // true
-'<truthy value> PUSH BCON PRINT <falsy value> PUSH BCON PRINT' // => true, true
-'<truthy value> PUSH <falsy value> NOT AND PRINT PUSH NOT CON NOT PRINT' // => true, true
+- '<any value> PUSH CON PRINT' // => true
+- '<truthy value> PUSH <any value> OR PRINT' // => true
+- '<truthy value> NOT PUSH <any value> CON PRINT' // => true
+- '<any value> PUSH <truthy value> CON PRINT' // => true
+- '<falsy value> PUSH <any value> CON PRINT' // true
+- '<truthy value> PUSH BCON PRINT <falsy value> PUSH BCON PRINT' // => true, true
+- '<truthy value> PUSH <falsy value> NOT AND PRINT PUSH NOT CON NOT PRINT' // => true, true
 
 - 'ID':
   - From the topmost sub-stack,
