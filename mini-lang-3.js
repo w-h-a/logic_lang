@@ -82,7 +82,7 @@ function toPush(accParam, stackParam) {
   } else {
     let counterpartsAndOriginal = stackParam.map((_, idx) => (idx === 0 ? accParam : Object.assign({}, accParam))).reverse();
     stackParam.forEach((sub, idx) => {
-      let k = getUserInput(`For object ${idx + 1}, enter 'Y' for CONCRETE or anything else for NONCONCRETE`) === 'Y';
+      let k = getUserInput(`For object of sub-stack ${idx + 1}, enter 'Y' for CONCRETE or anything else for NONCONCRETE (NOTE: the original object will be the last one)\n`) === 'Y';
       if (k) {
         counterpartsAndOriginal[idx]['K'] = 'CONCRETE';
       } else {
@@ -99,22 +99,19 @@ function toPop(stackParam) {
     if (idx !== (stackParam['length'] - 1)) {
       if (sub[sub['length'] - 1] === null || typeof sub[sub['length'] - 1] !== 'object') {
         sub.pop();
-      }
-
-      if (typeof sub[sub['length'] - 1] === 'object') {
+      } else if (typeof sub[sub['length'] - 1] === 'object') {
         stackParam.forEach(_ => sub.pop());
       }
     } else {
       if (sub['length'] === 0 || sub[sub['length'] - 1] === null || typeof sub[sub['length'] - 1] !== 'object') {
         result = sub.pop();
-      }
-
-      if (typeof sub[sub['length'] - 1] === 'object') {
+      } else if (typeof sub[sub['length'] - 1] === 'object') {
         stackParam.forEach((_, jdx) => {
           if (jdx === 0) {
             result = sub.pop();
+          } else {
+            sub.pop();
           }
-          sub.pop();
         });
       }
     }
@@ -261,6 +258,8 @@ do {
     let commandLine = getUserInput("Enter command\n=> ");
 
     register = miniLogLang(commandLine, register, stack);
+    stack.slice().forEach((_, idx) => console.log(`Sub-stack ${stack['length'] - idx}`, stack[stack['length'] - (idx + 1)].slice().reverse()));
+    console.log("Register:", register);
 
     keepGoing = getUserInput("Enter 'Y' to continue entering commands; otherwise, enter any key or hit enter to stop.\n") === 'Y';
   } while (keepGoing);

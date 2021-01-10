@@ -201,4 +201,4 @@ The corresponding operations where 'EVERY' is replaced with 'SOME' are also avai
   - Check, `stack.some(sub => sub.some(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'CONCRETE')))` and
   - Store result in register
 
-Given the way the program is structured, it is interesting to point out that if any of the operations beginning with 'POS' return true, then the corresponding 'NEC' operation will return true. That was intended but also a result of the fact that I don't know how to model an object x in each stack such that x has different properties in each stack.
+Given the way the program is structured, it is interesting to point out that if any of the operations beginning with 'POS' return true, then the corresponding 'NEC' operation will return true. That was intended but also a result of the fact that I don't know how to model an object x such that x has different properties in each stack.
