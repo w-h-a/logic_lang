@@ -1,3 +1,97 @@
+/*
+
+for miniLogLang(command, register, stack)
+1. SET array to split command by whitespace
+2. WHILE there are elements in the array
+  - IF the list of permissible operations does not include the element
+    - SET register to GET parseRegister(register, element) (see below)
+  - IF the element is identical to 'BOOL'
+    - SET register to Booleanized register
+    ELSE IF the element is identical to 'NOT'
+    - SET register to negation of register
+    ELSE IF the element is identical to 'PUSH'
+    - GET toPush(register, stack) (see below)
+    ELSE IF the element is identical to 'POP'
+    - SET register to GET toPop(stack) (see below)
+    ELSE
+    - SET register to performLogic(register, element, stack)
+3. RETURN register
+
+for parseRegister(register, element)
+
+1. IF element is identical to 'NaN'
+  - SET register to NaN
+  ELSE IF element is not NaN after converting to number type
+  - SET register to number type of element
+  ELSE IF element is identical to 'undefined'
+  - SET register to undefined
+  ELSE IF element is identical to 'null'
+  - SET register to null
+  ELSE IF element is identical to 'true'
+  - SET register to true
+  ELSE IF element is identical to 'false'
+  - SET register to false
+  ELSE IF element includes either { or [
+  - SET register to JSON.parse(element)
+  ELSE
+  - SET register to element (it is treated as a string)
+2. RETURN register
+
+for toPush(register, stack)
+
+IF either the register is null or not an object
+  - WHILE stack has sub-stacks
+    - SET sub-stack to include value of register
+  ELSE IF the register is an array
+    - SET copiesAndOriginal to array of length 0
+    - WHILE stack has sub-stacks
+      - IF idx is 0
+        - SET copiesAndOriginal to include original array
+        ELSE
+        - SET copiesAndOriginal to include shallow copy of original array
+    - SET copiesAndOriginal to reversed version of itself
+    - WHILE stack has sub-stacks
+      - SET sub-stack to include each element of copiesAndOriginal, taken one-by-one
+  ELSE (the register is a non-null, non-array object)
+    - SET counterpartsAndOriginal to array of length 0
+    - WHILE stack has sub-stacks
+      - IF idx is 0
+        - SET counterpartsAndOriginal to include original object
+        ELSE
+        - SET counterpartsAndOriginal to include shallow copy of original object
+    - SET counterpartsAndOriginal to reversed version of itself
+    - WHILE stack has sub-stacks
+      - SET k variable to GET getUserInput (translated into Boolean)
+        - IF k is true
+          - SET the K property of object at idx (of counterpartsAndOriginal) to 'CONCRETE'
+          ELSE
+          - SET the K property of object at idx (of counterpartsAndOriginal) to 'NONCONCRETE'
+      - SET sub-stack to include each element of counterpartsAndOriginal, taken one-by-one
+
+for toPop(stack)
+
+1. SET result variable to undefined
+2. WHILE stack has sub-stacks
+  - IF idx is not identical to the last index of stack (topmost sub-stack's index)
+    - IF the topmost element of the current sub-stack is null or not an object
+      - SET sub-stack to itself with last element popped off
+      ELSE IF the topmost element of the current sub-stack is an object
+      - FOR the number of sub-stacks
+        - SET sub-stack to itself with last element popped off
+    ELSE (idx is identical to the last index of stack (topmost sub-stack's index))
+    - IF the topmost element of the sub-stack is null or not an object
+      - SET sub-stack to itself with last element popped off
+      - SET result to popped off element
+      ELSE IF the topmost element of the sub-stack is an object
+      - FOR the number of sub-stacks
+        - IF jdx is 0 (i.e., if this is the first round of popping)
+          - SET sub-stack to itself with last element popped off
+          - SET result to popped off element
+          ELSE
+          - SET sub-stack to itself with last element popped off
+3. RETURN result
+*/
+
 let toWelcome = true;
 let toRepeat;
 let readline = require('readline-sync');
@@ -25,99 +119,6 @@ let operations = [
   'POS-EVERY-OBJECT-CONCRETE', 'POS-EVERY-NOT-OBJECT-CONCRETE',
   'POS-SOME-OBJECT-CONCRETE', 'POS-SOME-NOT-OBJECT-CONCRETE'
 ];
-
-function getUserInput(inputParam) {
-  return readline.question(inputParam);
-}
-
-function miniLogLang(commandLineParam, registerParam, stackParam) {
-  return commandLineParam.split(' ').reduce((acc, ele) => {
-    if (!operations.includes(ele)) {
-      acc = parseRegister(acc, ele);
-    }
-
-    if (ele === 'BOOL') {
-      acc = Boolean(acc);
-    } else if (ele === 'NOT') {
-      acc = !acc;
-    } else if (ele === 'PUSH') {
-      toPush(acc, stackParam);
-    } else if (ele === 'POP') {
-      acc = toPop(stackParam);
-    } else {
-      acc = performLogic(acc, ele, stackParam);
-    }
-
-    return acc;
-  }, registerParam);
-}
-
-function parseRegister(accParam, eleParam) {
-  if (eleParam === 'NaN') {
-    accParam = NaN;
-  } else if (!Number.isNaN(Number(eleParam))) {
-    accParam = Number(eleParam);
-  } else if (eleParam === 'undefined') {
-    accParam = undefined;
-  } else if (eleParam === 'null') {
-    accParam = null;
-  } else if (eleParam === 'true') {
-    accParam = true;
-  } else if (eleParam === 'false') {
-    accParam = false;
-  } else if (eleParam.includes('{') || eleParam.includes('[')) {
-    accParam = JSON.parse(eleParam);
-  } else {
-    accParam = eleParam;
-  }
-  return accParam;
-}
-
-function toPush(accParam, stackParam) {
-  if (accParam === null || typeof accParam !== 'object') {
-    stackParam.forEach(sub => sub.push(accParam));
-  } else if (Array.isArray(accParam)) {
-    let copiesAndOriginal = stackParam.map((_, idx) => (idx === 0 ? accParam : accParam.slice())).reverse();
-    stackParam.forEach(sub => sub.push(...copiesAndOriginal));
-  } else {
-    let counterpartsAndOriginal = stackParam.map((_, idx) => (idx === 0 ? accParam : Object.assign({}, accParam))).reverse();
-    stackParam.forEach((sub, idx) => {
-      let k = getUserInput(`For object of sub-stack ${idx + 1}, enter 'Y' for CONCRETE or anything else for NONCONCRETE (NOTE: the original object will be the last one)\n`).toUpperCase() === 'Y';
-      if (k) {
-        counterpartsAndOriginal[idx]['K'] = 'CONCRETE';
-      } else {
-        counterpartsAndOriginal[idx]['K'] = 'NONCONCRETE';
-      }
-      sub.push(...counterpartsAndOriginal);
-    });
-  }
-}
-
-function toPop(stackParam) {
-  let result;
-  stackParam.forEach((sub, idx) => {
-    if (idx !== (stackParam['length'] - 1)) {
-      if (sub[sub['length'] - 1] === null || typeof sub[sub['length'] - 1] !== 'object') {
-        sub.pop();
-      } else if (typeof sub[sub['length'] - 1] === 'object') {
-        stackParam.forEach(_ => sub.pop());
-      }
-    } else {
-      if (sub['length'] === 0 || sub[sub['length'] - 1] === null || typeof sub[sub['length'] - 1] !== 'object') {
-        result = sub.pop();
-      } else if (typeof sub[sub['length'] - 1] === 'object') {
-        stackParam.forEach((_, jdx) => {
-          if (jdx === 0) {
-            result = sub.pop();
-          } else {
-            sub.pop();
-          }
-        });
-      }
-    }
-  });
-  return result;
-}
 
 function performLogic(accParam, eleParam, stackParam) {
   if (eleParam === 'AND') {
@@ -227,6 +228,99 @@ function performLogic(accParam, eleParam, stackParam) {
   }
 
   return accParam;
+}
+
+function getUserInput(inputParam) {
+  return readline.question(inputParam);
+}
+
+function miniLogLang(commandLineParam, registerParam, stackParam) {
+  return commandLineParam.split(' ').reduce((acc, ele) => {
+    if (!operations.includes(ele)) {
+      acc = parseRegister(acc, ele);
+    }
+
+    if (ele === 'BOOL') {
+      acc = Boolean(acc);
+    } else if (ele === 'NOT') {
+      acc = !acc;
+    } else if (ele === 'PUSH') {
+      toPush(acc, stackParam);
+    } else if (ele === 'POP') {
+      acc = toPop(stackParam);
+    } else {
+      acc = performLogic(acc, ele, stackParam);
+    }
+
+    return acc;
+  }, registerParam);
+}
+
+function parseRegister(accParam, eleParam) {
+  if (eleParam === 'NaN') {
+    accParam = NaN;
+  } else if (!Number.isNaN(Number(eleParam))) {
+    accParam = Number(eleParam);
+  } else if (eleParam === 'undefined') {
+    accParam = undefined;
+  } else if (eleParam === 'null') {
+    accParam = null;
+  } else if (eleParam === 'true') {
+    accParam = true;
+  } else if (eleParam === 'false') {
+    accParam = false;
+  } else if (eleParam.includes('{') || eleParam.includes('[')) {
+    accParam = JSON.parse(eleParam);
+  } else {
+    accParam = eleParam;
+  }
+  return accParam;
+}
+
+function toPush(accParam, stackParam) {
+  if (accParam === null || typeof accParam !== 'object') {
+    stackParam.forEach(sub => sub.push(accParam));
+  } else if (Array.isArray(accParam)) {
+    let copiesAndOriginal = stackParam.map((_, idx) => (idx === 0 ? accParam : accParam.slice())).reverse();
+    stackParam.forEach(sub => sub.push(...copiesAndOriginal));
+  } else {
+    let counterpartsAndOriginal = stackParam.map((_, idx) => (idx === 0 ? accParam : Object.assign({}, accParam))).reverse();
+    stackParam.forEach((sub, idx) => {
+      let k = getUserInput(`For object of sub-stack ${idx + 1}, enter 'Y' for CONCRETE or anything else for NONCONCRETE (NOTE: the original object will be the last one)\n`).toUpperCase() === 'Y';
+      if (k) {
+        counterpartsAndOriginal[idx]['K'] = 'CONCRETE';
+      } else {
+        counterpartsAndOriginal[idx]['K'] = 'NONCONCRETE';
+      }
+      sub.push(...counterpartsAndOriginal);
+    });
+  }
+}
+
+function toPop(stackParam) {
+  let result;
+  stackParam.forEach((sub, idx) => {
+    if (idx !== (stackParam['length'] - 1)) {
+      if (sub[sub['length'] - 1] === null || typeof sub[sub['length'] - 1] !== 'object') {
+        sub.pop();
+      } else if (typeof sub[sub['length'] - 1] === 'object') {
+        stackParam.forEach(_ => sub.pop());
+      }
+    } else {
+      if (sub['length'] === 0 || sub[sub['length'] - 1] === null || typeof sub[sub['length'] - 1] !== 'object') {
+        result = sub.pop();
+      } else if (typeof sub[sub['length'] - 1] === 'object') {
+        stackParam.forEach((_, jdx) => {
+          if (jdx === 0) {
+            result = sub.pop();
+          } else {
+            sub.pop();
+          }
+        });
+      }
+    }
+  });
+  return result;
 }
 
 do {
