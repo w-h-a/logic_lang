@@ -70,13 +70,13 @@ All of the operations in the next section also perform a sort of popping operati
 
 Examples:
 
-- 'anyvalue PUSH CON PRINT' // => true
-- 'truthy PUSH anyvalue OR PRINT' // => true
-- 'truthy NOT PUSH anyvalue CON PRINT' // => true
-- 'truthy PUSH truthy CON PRINT' // => true
-- 'falsy PUSH anyvalue CON PRINT' // true
-- 'truthy PUSH BCON PRINT falsy PUSH BCON PRINT' // => true, true
-- 'truthy PUSH falsy NOT AND PRINT PUSH NOT CON NOT PRINT' // => true, true
+- '`anyvalue` PUSH CON PRINT' // => true
+- '`truthy` PUSH `anyvalue` OR PRINT' // => true
+- '`truthy` NOT PUSH `anyvalue` CON PRINT' // => true
+- '`truthy` PUSH `truthy` CON PRINT' // => true
+- '`falsy` PUSH `anyvalue` CON PRINT' // true
+- '`truthy` PUSH BCON PRINT `falsy` PUSH BCON PRINT' // => true, true
+- '`truthy` PUSH `falsy` NOT AND PRINT PUSH NOT CON NOT PRINT' // => true, true
 
 =====================================================================================
 
