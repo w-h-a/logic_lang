@@ -29,8 +29,6 @@ All other operations also operate on the stack. The stack in mini-lang-3.js is u
     - third, all _n_ objects are placed into each sub-stack such that the original is the topmost, and
     - fourth, the original value also remains in the register.
 - 'POP':
-  - If a
-
   - If a null or primitive value is the topmost value of the topmost sub-stack, the value is removed from each of the sub-stacks and placed into the register.
   - If an object (includes arrays) is the topmost value of the topmost sub-stack,
     - the value is placed into the register, and
