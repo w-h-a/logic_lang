@@ -4,7 +4,7 @@ The program in mini-lang-3.js implements a sort of stack-and-register programmin
 
 A stack is a list of values that grows and shrinks. A stack-and-register programming language is a language that uses a stack of values. Each operation in the language operates on a register, which can be considered the current value. The register is not part of the stack. The register's value is initialized to `0`.
 
-Programs are supplied to the language via a string. Each of the operations detailed below is self-contained (i.e., operations are not operands of one another) and the syntax of the string input is such that each operation is in uppercase and separated by one whitespace (e.g., '5 PUSH NOT PRINT'). An object (includes arrays) in the language must use JSON syntax (e.g., '{"K": "NONCONCRETE","essential":{"R": "IRRATIONAL","P":"NON-PERSON"}} PUSH ["BLUE",2,[]] PUSH [] PRINT').
+Programs are supplied to the language via a string. Each of the operations detailed below is self-contained (i.e., operations are not operands of one another) and the syntax of the string input is such that each operation is in uppercase and separated by one whitespace (e.g., '5 PUSH NOT PRINT'). An object (includes arrays) in the language must use JSON syntax (e.g., '{"K":"NONCONCRETE","necessary":{"P":0,"T":true}} PUSH ["BLUE",2,[],null] PUSH [] PRINT').
 
 ## Register-only Operations ##
 
