@@ -18,7 +18,6 @@ for miniLogLang(command, register, stack)
 3. RETURN register
 
 for parseRegister(register, element)
-
 1. IF element is identical to 'NaN'
   - SET register to NaN
   ELSE IF element is not NaN after converting to number type
@@ -38,7 +37,6 @@ for parseRegister(register, element)
 2. RETURN register
 
 for toPush(register, stack)
-
 IF either the register is null or not an object
   - WHILE stack has sub-stacks
     - SET sub-stack to include value of register
@@ -69,7 +67,6 @@ IF either the register is null or not an object
       - SET sub-stack to include each element of counterpartsAndOriginal, taken one-by-one
 
 for toPop(stack)
-
 1. SET result variable to undefined
 2. WHILE stack has sub-stacks
   - IF idx is not identical to the last index of stack (topmost sub-stack's index)
@@ -90,6 +87,7 @@ for toPop(stack)
           ELSE
           - SET sub-stack to itself with last element popped off
 3. RETURN result
+
 */
 
 let toWelcome = true;
