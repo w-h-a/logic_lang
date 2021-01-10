@@ -350,7 +350,10 @@ do {
     let commandLine = getUserInput("Enter command\n=> ");
 
     register = miniLogLang(commandLine, register, stack);
-    stack.slice().forEach((_, idx) => console.log(`Sub-stack ${stack['length'] - idx}`, stack[stack['length'] - (idx + 1)].slice().reverse()));
+    //stack.slice().forEach((_, idx) => console.log(`Sub-stack ${stack['length'] - idx}`, stack[stack['length'] - (idx + 1)].slice().reverse()));
+    stack.slice().forEach((_, idx) => stack[stack['length'] - (idx + 1)].slice().forEach((_, jdx) => {
+      console.log(`Element ${stack[stack['length'] - (idx + 1)]['length'] - jdx} of Sub-stack ${stack['length'] - idx}`, stack[stack['length'] - (idx + 1)][stack[stack['length'] - (idx + 1)]['length'] - (jdx + 1)]);
+    }));
     console.log("Register:", register);
 
     keepGoing = getUserInput("Enter 'Y' to continue entering commands; otherwise, enter any key or hit enter to stop.\n").toUpperCase() === 'Y';

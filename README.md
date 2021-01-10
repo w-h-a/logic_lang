@@ -206,3 +206,24 @@ The corresponding operations where 'EVERY' is replaced with 'SOME' are also avai
   - Store result in register
 
 Given the way the program is structured, it is interesting to point out that if any of the operations beginning with 'POS' return true, then the corresponding 'NEC' operation will return true. That was intended but also a result of the fact that I don't know how to model an object x such that x has different properties in each stack.
+
+=====================================================================================
+
+Test Cases :
+
+miniLogLang('PRINT'); // => false
+miniLogLang('NOT NOT PRINT') // => false
+miniLogLang('5 PUSH 3 AND PRINT'); // => true
+miniLogLang('5 PRINT NOT PUSH 3 PRINT NOT OR PRINT'); // => true, true, false
+miniLogLang('5 PUSH POP PRINT'); // => true
+miniLogLang('5 PUSH PRINT'); // => true
+miniLogLang("[0] PUSH {P: 2, K: 'concrete'} PUSH 0 PUSH PRINT EVERY-NOT-OBJECT-EXISTS PRINT POP PRINT EVERY-OBJECT-EXISTS PRINT SOME-OBJECT-CONCRETE PRINT"); // => false, true, false, true, true
+miniLogLang('6 PUSH'); // => n/a
+miniLogLang('PROOF PRINT'); // => true
+miniLogLang("1 OR PRINT PUSH ['b'] PUSH SOME-ID PRINT ['b'] SOME-ID PRINT NOT PRINT"); // => true, true, false, true
+miniLogLang('true PUSH true PUSH false NOT PUSH SOME-BCON PRINT SOME-NOT-BCON PRINT POP NOT PUSH SOME-NOT-BCON PRINT EVERY-NOT-BCON PRINT'); // => true, false, true, false
+miniLogLang('undefined PUSH null PUSH EVERY-NOT-TRUE PRINT true EVERY-NOT-AND PRINT SOME-AND NOT PRINT'); // => true, true, true
+miniLogLang('false PUSH true PUSH ID PRINT TRU NOT PRINT'); // => true, true
+miniLogLang('false PUSH +0 PUSH NaN PUSH NaN PUSH ID PRINT SOME-PRIM-EXISTS PRINT CON PRINT EVERY-PRIM-EXISTS PRINT'); // => false, true, true, true
+miniLogLang('EVERY-OBJECT-EXISTS PRINT EVERY-PRIM-EXISTS PRINT'); // => true, true
+miniLogLang('SOME-OBJECT-EXISTS PRINT SOME-PRIM-EXISTS PRINT'); // => false, false
