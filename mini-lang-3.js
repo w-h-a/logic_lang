@@ -4,7 +4,7 @@ let readline = require('readline-sync');
 let minSubStackNum = 2;
 
 let operations = [
-  'PRINT', 'NOT',
+  'BOOL', 'NOT',
   'PUSH', 'POP',
   'AND', 'OR', 'CON', 'BCON',
   'ID', 'OBJECT-EXISTS', 'OBJECT-CONCRETE', 'PRIME-EXISTS',
@@ -36,8 +36,8 @@ function miniLogLang(commandLineParam, registerParam, stackParam) {
       acc = parseRegister(acc, ele);
     }
 
-    if (ele === 'PRINT') {
-      console.log(Boolean(acc));
+    if (ele === 'BOOL') {
+      acc = Boolean(acc);
     } else if (ele === 'NOT') {
       acc = !acc;
     } else if (ele === 'PUSH') {

@@ -4,13 +4,13 @@ The program in mini-lang-3.js implements a sort of stack-and-register programmin
 
 A stack is a list of values that grows and shrinks. A stack-and-register programming language is a language that uses a stack of values. Each operation in the language operates on a register, which can be considered the current value. The register is not part of the stack. The register's value is initialized to `0`.
 
-Programs are supplied to the language via a string. Each of the operations detailed below is self-contained (i.e., operations are not operands of one another) and the syntax of the string input is such that each operation is in uppercase and separated by one whitespace (e.g., '5 PUSH NOT PRINT'). An object (includes arrays) in the language must use JSON syntax (e.g., '{"K":"NONCONCRETE","necessary":{"P":0,"T":true}} PUSH ["BLUE",2,[],null] PUSH [] PRINT').
+Programs are supplied to the language via a string. Each of the operations detailed below is self-contained (i.e., operations are not operands of one another) and the syntax of the string input is such that each operation is in uppercase and separated by one whitespace (e.g., '5 PUSH NOT'). An object (includes arrays) in the language must use JSON syntax (e.g., '{"K":"NONCONCRETE","necessary":{"P":0,"T":true}} PUSH ["BLUE",2,[],null] PUSH [] BOOL').
 
 ## Register-only Operations ##
 
 - 'X': Place any "stringified" JS value, 'X', into the register.
 
-- 'PRINT': Prints the boolean version of the register value.
+- 'BOOL': Booleanizes the register value.
 - 'NOT': Negates the register value and returns the result to the register.
 
 ## PUSH and POP ##
@@ -68,13 +68,15 @@ All of the operations in the next section also perform a sort of popping operati
 
 Examples:
 
-- '`anyvalue` PUSH CON PRINT' // => true
-- '`truthy` PUSH `anyvalue` OR PRINT' // => true
-- '`truthy` NOT PUSH `anyvalue` CON PRINT' // => true
-- '`truthy` PUSH `truthy` CON PRINT' // => true
-- '`falsy` PUSH `anyvalue` CON PRINT' // true
-- '`truthy` PUSH BCON PRINT `falsy` PUSH BCON PRINT' // => true, true
-- '`truthy` PUSH `falsy` NOT AND PRINT PUSH NOT CON NOT PRINT' // => true, true
+- '`anyvalue` PUSH CON' // => true
+- '`falsy` BOOL NOT' // => true
+- '`truthy` PUSH `anyvalue` OR' // => true
+- '`truthy` NOT PUSH `anyvalue` CON' // => true
+- '`truthy` PUSH `truthy` CON' // => true
+- '`falsy` PUSH `anyvalue` CON' // true
+- '`truthy` PUSH BCON' // => true
+- '`falsy` PUSH BCON' // => true
+- '`truthy` PUSH `falsy` NOT AND PUSH NOT CON NOT' // => true
 
 =====================================================================================
 
