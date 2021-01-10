@@ -207,8 +207,7 @@ The corresponding operations where 'EVERY' is replaced with 'SOME' are also avai
 
 Given the way the program is structured, it is interesting to point out that if any of the operations beginning with 'POS' return true, then the corresponding 'NEC' operation will return true. That was intended but also a result of the fact that I don't know how to model an object x such that x has different properties in each stack.
 
-=====================================================================================
-
+<!--
 Test Cases :
 
 miniLogLang('PRINT'); // => false
@@ -227,3 +226,4 @@ miniLogLang('false PUSH true PUSH ID PRINT TRU NOT PRINT'); // => true, true
 miniLogLang('false PUSH +0 PUSH NaN PUSH NaN PUSH ID PRINT SOME-PRIM-EXISTS PRINT CON PRINT EVERY-PRIM-EXISTS PRINT'); // => false, true, true, true
 miniLogLang('EVERY-OBJECT-EXISTS PRINT EVERY-PRIM-EXISTS PRINT'); // => true, true
 miniLogLang('SOME-OBJECT-EXISTS PRINT SOME-PRIM-EXISTS PRINT'); // => false, false
+-->
