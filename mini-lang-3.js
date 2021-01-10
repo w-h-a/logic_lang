@@ -45,7 +45,7 @@ function miniLogLang(commandLineParam, registerParam, stackParam) {
     } else if (ele === 'POP') {
       acc = toPop(stackParam);
     } else {
-      acc = performLogic(acc, ele, stackParam)
+      acc = performLogic(acc, ele, stackParam);
     }
 
     return acc;
@@ -77,10 +77,10 @@ function toPush(accParam, stackParam) {
   if (accParam === null || typeof accParam !== 'object') {
     stackParam.forEach(sub => sub.push(accParam));
   } else if (Array.isArray(accParam)) {
-    let copiesAndOriginal = stackParam.map((ele, idx) => (idx === 0 ? accParam : accParam.slice())).reverse();
+    let copiesAndOriginal = stackParam.map((_, idx) => (idx === 0 ? accParam : accParam.slice())).reverse();
     stackParam.forEach(sub => sub.push(...copiesAndOriginal));
   } else {
-    let counterpartsAndOriginal = stackParam.map((ele, idx) => (idx === 0 ? accParam : Object.assign({}, accParam))).reverse();
+    let counterpartsAndOriginal = stackParam.map((_, idx) => (idx === 0 ? accParam : Object.assign({}, accParam))).reverse();
     stackParam.forEach((sub, idx) => {
       let k = getUserInput(`For object ${idx + 1}, enter 'Y' for CONCRETE or anything else for NONCONCRETE`) === 'Y';
       if (k) {
@@ -95,19 +95,22 @@ function toPush(accParam, stackParam) {
 
 function toPop(stackParam) {
   let result;
-
   stackParam.forEach((sub, idx) => {
     if (idx !== (stackParam['length'] - 1)) {
       if (sub[sub['length'] - 1] === null || typeof sub[sub['length'] - 1] !== 'object') {
         sub.pop();
-      } else if (typeof sub[sub['length'] - 1] === 'object') {
-        stackParam.forEach((ele, jdx) => sub.pop());
+      }
+
+      if (typeof sub[sub['length'] - 1] === 'object') {
+        stackParam.forEach(_ => sub.pop());
       }
     } else {
       if (sub['length'] === 0 || sub[sub['length'] - 1] === null || typeof sub[sub['length'] - 1] !== 'object') {
         result = sub.pop();
-      } else if (typeof sub[sub['length'] - 1] === 'object') {
-        stackParam.forEach((ele, jdx) => {
+      }
+
+      if (typeof sub[sub['length'] - 1] === 'object') {
+        stackParam.forEach((_, jdx) => {
           if (jdx === 0) {
             result = sub.pop();
           }
@@ -116,7 +119,6 @@ function toPop(stackParam) {
       }
     }
   });
-
   return result;
 }
 
@@ -172,7 +174,7 @@ function performLogic(accParam, eleParam, stackParam) {
   } else if (eleParam === 'EVERY-OBJECT-CONCRETE') {
     accParam = stackParam[stackParam['length'] - 1].every(ele => (typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE'));
   } else if (eleParam === 'EVERY-NOT-OBJECT-CONCRETE') {
-    accParam = stackParam[stackParam['length'] - 1].every(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'CONCRETE'));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => !(typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE'));
   } else if (eleParam === 'EVERY-PRIME-EXISTS') {
     accParam = stackParam[stackParam['length'] - 1].every(ele => (typeof ele !== 'object' && !Number.isNaN(ele)));
   } else if (eleParam === 'EVERY-NOT-PRIME-EXISTS') {
@@ -204,7 +206,7 @@ function performLogic(accParam, eleParam, stackParam) {
   } else if (eleParam === 'SOME-OBJECT-CONCRETE') {
     accParam = stackParam[stackParam['length'] - 1].some(ele => (typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE'));
   } else if (eleParam === 'SOME-NOT-OBJECT-CONCRETE') {
-    accParam = stackParam[stackParam['length'] - 1].some(ele => !(typeof value === 'object' && ele !== null && value['K'] === 'CONCRETE'));
+    accParam = stackParam[stackParam['length'] - 1].some(ele => !(typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE'));
   } else if (eleParam === 'SOME-PRIME-EXISTS') {
     accParam = stackParam[stackParam['length'] - 1].some(ele => (typeof ele !== 'object' && !Number.isNaN(ele)));
   } else if (eleParam === 'SOME-NOT-PRIME-EXISTS') {

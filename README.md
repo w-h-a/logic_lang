@@ -17,18 +17,20 @@ Programs are supplied to the language via a string. Each of the operations detai
 
 All other operations also operate on the stack. The stack in mini-lang-3.js is unique in that it is initialized to include _n_ arrays of length 0, which might be thought of as sub-stacks. The stack always includes these _n_ sub-stacks. Before listing out the other operations of mini-lang-3.js, it is important to point out that objects (excludes arrays) are treated specially in the language. There is one primitive property denoted by key 'K'. The K property is either 'CONCRETE' (exclusive) or 'NONCONCRETE'. The user must specify the K property.
 
-- 'PUSH':
+- 'PUSH':  
   - If a null or primitive value is pushed from the register, that value gets copied into every sub-stack. The value stays in the register.
   - If an array is pushed from the register, then
     - first, _n - 1_ (shallow) copies of the value are made,
-    - second, all _n_ arrays are placed into each sub-stack, and
+    - second, all _n_ arrays are placed into each sub-stack such that the original is the topmost, and
     - third, the original value also remains in the register.
   - If an object (excludes arrays) is pushed from the register, then
     - first, _n - 1_ (shallow) copies of the value are made,
-    - second, the K property is determined by user's input, and
-    - third, all _n_ arrays are placed into each sub-stack.
+    - second, the K property is determined by user's input.
+    - third, all _n_ objects are placed into each sub-stack such that the original is the topmost, and
     - fourth, the original value also remains in the register.
 - 'POP':
+  - If a
+
   - If a null or primitive value is the topmost value of the topmost sub-stack, the value is removed from each of the sub-stacks and placed into the register.
   - If an object (includes arrays) is the topmost value of the topmost sub-stack,
     - the value is placed into the register, and
