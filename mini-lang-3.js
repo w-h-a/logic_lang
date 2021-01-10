@@ -27,7 +27,7 @@ let operations = [
 ];
 
 function getUserInput(inputParam) {
-  return readline.question(inputParam).toUpperCase();
+  return readline.question(inputParam);
 }
 
 function miniLogLang(commandLineParam, registerParam, stackParam) {
@@ -53,17 +53,17 @@ function miniLogLang(commandLineParam, registerParam, stackParam) {
 }
 
 function parseRegister(accParam, eleParam) {
-  if (eleParam === 'NAN') {
+  if (eleParam === 'NaN') {
     accParam = NaN;
   } else if (!Number.isNaN(Number(eleParam))) {
     accParam = Number(eleParam);
-  } else if (eleParam === 'UNDEFINED') {
+  } else if (eleParam === 'undefined') {
     accParam = undefined;
-  } else if (eleParam === 'NULL') {
+  } else if (eleParam === 'null') {
     accParam = null;
-  } else if (eleParam === 'TRUE') {
+  } else if (eleParam === 'true') {
     accParam = true;
-  } else if (eleParam === 'FALSE') {
+  } else if (eleParam === 'false') {
     accParam = false;
   } else if (eleParam.includes('{') || eleParam.includes('[')) {
     accParam = JSON.parse(eleParam);
@@ -82,7 +82,7 @@ function toPush(accParam, stackParam) {
   } else {
     let counterpartsAndOriginal = stackParam.map((_, idx) => (idx === 0 ? accParam : Object.assign({}, accParam))).reverse();
     stackParam.forEach((sub, idx) => {
-      let k = getUserInput(`For object of sub-stack ${idx + 1}, enter 'Y' for CONCRETE or anything else for NONCONCRETE (NOTE: the original object will be the last one)\n`) === 'Y';
+      let k = getUserInput(`For object of sub-stack ${idx + 1}, enter 'Y' for CONCRETE or anything else for NONCONCRETE (NOTE: the original object will be the last one)\n`).toUpperCase() === 'Y';
       if (k) {
         counterpartsAndOriginal[idx]['K'] = 'CONCRETE';
       } else {
@@ -261,8 +261,8 @@ do {
     stack.slice().forEach((_, idx) => console.log(`Sub-stack ${stack['length'] - idx}`, stack[stack['length'] - (idx + 1)].slice().reverse()));
     console.log("Register:", register);
 
-    keepGoing = getUserInput("Enter 'Y' to continue entering commands; otherwise, enter any key or hit enter to stop.\n") === 'Y';
+    keepGoing = getUserInput("Enter 'Y' to continue entering commands; otherwise, enter any key or hit enter to stop.\n").toUpperCase() === 'Y';
   } while (keepGoing);
 
-  toRepeat = getUserInput("Enter 'Y' to start with fresh stack; otherwise, enter any key or hit enter to stop.\n") === 'Y';
+  toRepeat = getUserInput("Enter 'Y' to start with fresh stack; otherwise, enter any key or hit enter to stop.\n").toUpperCase() === 'Y';
 } while (toRepeat);
