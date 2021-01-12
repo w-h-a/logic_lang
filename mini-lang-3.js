@@ -41,30 +41,23 @@ IF either the register is null or not an object
   - WHILE stack has sub-stacks
     - SET sub-stack to include value of register
   ELSE IF the register is an array
-    - SET copiesAndOriginal to array of length 0
-    - WHILE stack has sub-stacks
-      - IF idx is 0
-        - SET copiesAndOriginal to include original array
-        ELSE
-        - SET copiesAndOriginal to include shallow copy of original array
-    - SET copiesAndOriginal to reversed version of itself
-    - WHILE stack has sub-stacks
-      - SET sub-stack to include each element of copiesAndOriginal, taken one-by-one
+  - WHILE stack has sub-stacks
+    - SET sub-stack to include array
   ELSE (the register is a non-null, non-array object)
-    - SET counterpartsAndOriginal to array of length 0
-    - WHILE stack has sub-stacks
-      - IF idx is 0
-        - SET counterpartsAndOriginal to include original object
+  - SET counterpartsAndOriginal to array of length 0
+  - WHILE stack has sub-stacks
+    - IF idx is 0
+      - SET counterpartsAndOriginal to include original object
+      ELSE
+      - SET counterpartsAndOriginal to include shallow copy of original object
+  - SET counterpartsAndOriginal to reversed version of itself
+  - WHILE stack has sub-stacks
+    - SET k variable to GET getUserInput (translated into Boolean)
+      - IF k is true
+        - SET the K property of object at idx (of counterpartsAndOriginal) to 'CONCRETE'
         ELSE
-        - SET counterpartsAndOriginal to include shallow copy of original object
-    - SET counterpartsAndOriginal to reversed version of itself
-    - WHILE stack has sub-stacks
-      - SET k variable to GET getUserInput (translated into Boolean)
-        - IF k is true
-          - SET the K property of object at idx (of counterpartsAndOriginal) to 'CONCRETE'
-          ELSE
-          - SET the K property of object at idx (of counterpartsAndOriginal) to 'NONCONCRETE'
-      - SET sub-stack to include each element of counterpartsAndOriginal, taken one-by-one
+        - SET the K property of object at idx (of counterpartsAndOriginal) to 'NONCONCRETE'
+    - SET sub-stack to include each element of counterpartsAndOriginal, taken one-by-one
 
 for toPop(stack)
 1. SET result variable to undefined
@@ -72,11 +65,16 @@ for toPop(stack)
   - IF idx is not identical to the last index of stack (topmost sub-stack's index)
     - IF the topmost element of the current sub-stack is null or not an object
       - SET sub-stack to itself with last element popped off
+      ELSE IF the topmost element of the current sub-stack is an array
+      - SET sub-stack to itself with last element popped off
       ELSE IF the topmost element of the current sub-stack is an object
       - FOR the number of sub-stacks
         - SET sub-stack to itself with last element popped off
     ELSE (idx is identical to the last index of stack (topmost sub-stack's index))
     - IF the topmost element of the sub-stack is null or not an object
+      - SET sub-stack to itself with last element popped off
+      - SET result to popped off element
+      ELSE IF the topmost element of the sub-stack is an array
       - SET sub-stack to itself with last element popped off
       - SET result to popped off element
       ELSE IF the topmost element of the sub-stack is an object
@@ -136,13 +134,13 @@ function performLogic(accParam, eleParam, stackParam) {
     accParam = leftOperand === accParam;
   } else if (eleParam === 'OBJECT-EXISTS') {
     let operand = toPop(stackParam);
-    accParam = (typeof operand === 'object' && operand !== null && Object.keys(operand)['length'] > 0);
+    accParam = (typeof operand === 'object' && operand !== null && Object.values(operand).some(ele => ele !== null && ele !== undefined && !Number.isNaN(ele)));
   } else if (eleParam === 'OBJECT-CONCRETE') {
     let operand = toPop(stackParam);
     accParam = (typeof operand === 'object' && operand !== null && operand['K'] === 'CONCRETE');
   } else if (eleParam === 'PRIME-EXISTS') {
     let operand = toPop(stackParam);
-    accParam = (typeof operand !== 'object' && !Number.isNaN(operand));
+    accParam = (typeof operand !== 'object' && operand !== undefined && !Number.isNaN(operand));
   } else if (eleParam === 'EVERY-AND') {
     accParam = stackParam[stackParam['length'] - 1].every(ele => (Boolean(ele) && Boolean(accParam)));
   } else if (eleParam === 'EVERY-NOT-AND') {
@@ -164,17 +162,17 @@ function performLogic(accParam, eleParam, stackParam) {
   } else if (eleParam === 'EVERY-NOT-ID') {
     accParam = stackParam[stackParam['length'] - 1].every(ele => ele !== accParam);
   } else if (eleParam === 'EVERY-OBJECT-EXISTS') {
-    accParam = stackParam[stackParam['length'] - 1].every(ele => (typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => (typeof ele === 'object' && ele !== null && Object.values(ele).some(val => val !== null && val !== undefined && !Number.isNaN(val))));
   } else if (eleParam === 'EVERY-NOT-OBJECT-EXISTS') {
-    accParam = stackParam[stackParam['length'] - 1].every(ele => !(typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => !(typeof ele === 'object' && ele !== null && Object.values(ele).some(val => val !== null && val !== undefined && !Number.isNaN(val))));
   } else if (eleParam === 'EVERY-OBJECT-CONCRETE') {
     accParam = stackParam[stackParam['length'] - 1].every(ele => (typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE'));
   } else if (eleParam === 'EVERY-NOT-OBJECT-CONCRETE') {
     accParam = stackParam[stackParam['length'] - 1].every(ele => !(typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE'));
   } else if (eleParam === 'EVERY-PRIME-EXISTS') {
-    accParam = stackParam[stackParam['length'] - 1].every(ele => (typeof ele !== 'object' && !Number.isNaN(ele)));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => (typeof ele !== 'object' && ele !== undefined && !Number.isNaN(ele)));
   } else if (eleParam === 'EVERY-NOT-PRIME-EXISTS') {
-    accParam = stackParam[stackParam['length'] - 1].every(ele => !(typeof ele !== 'object' && !Number.isNaN(ele)));
+    accParam = stackParam[stackParam['length'] - 1].every(ele => !(typeof ele !== 'object' && ele !== undefined && !Number.isNaN(ele)));
   } else if (eleParam === 'SOME-AND') {
     accParam = stackParam[stackParam['length'] - 1].some(ele => (Boolean(ele) && Boolean(accParam)));
   } else if (eleParam === 'SOME-NOT-AND') {
@@ -196,17 +194,17 @@ function performLogic(accParam, eleParam, stackParam) {
   } else if (eleParam === 'SOME-NOT-ID') {
     accParam = stackParam[stackParam['length'] - 1].some(ele => ele !== accParam);
   } else if (eleParam === 'SOME-OBJECT-EXISTS') {
-    accParam = stackParam[stackParam['length'] - 1].some(ele => (typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0));
+    accParam = stackParam[stackParam['length'] - 1].some(ele => (typeof ele === 'object' && ele !== null && Object.values(ele).some(val => val !== null && val !== undefined && !Number.isNaN(val))));
   } else if (eleParam === 'SOME-NOT-OBJECT-EXISTS') {
-    accParam = stackParam[stackParam['length'] - 1].some(ele => !(typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0));
+    accParam = stackParam[stackParam['length'] - 1].some(ele => !(typeof ele === 'object' && ele !== null && Object.values(ele).some(val => val !== null && val !== undefined && !Number.isNaN(val))));
   } else if (eleParam === 'SOME-OBJECT-CONCRETE') {
     accParam = stackParam[stackParam['length'] - 1].some(ele => (typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE'));
   } else if (eleParam === 'SOME-NOT-OBJECT-CONCRETE') {
     accParam = stackParam[stackParam['length'] - 1].some(ele => !(typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE'));
   } else if (eleParam === 'SOME-PRIME-EXISTS') {
-    accParam = stackParam[stackParam['length'] - 1].some(ele => (typeof ele !== 'object' && !Number.isNaN(ele)));
+    accParam = stackParam[stackParam['length'] - 1].some(ele => (typeof ele !== 'object' && ele !== undefined && !Number.isNaN(ele)));
   } else if (eleParam === 'SOME-NOT-PRIME-EXISTS') {
-    accParam = stackParam[stackParam['length'] - 1].some(ele => !(typeof ele !== 'object' && !Number.isNaN(ele)));
+    accParam = stackParam[stackParam['length'] - 1].some(ele => !(typeof ele !== 'object' && ele !== undefined && !Number.isNaN(ele)));
   } else if (eleParam === 'NEC-EVERY-OBJECT-CONCRETE') {
     accParam = stackParam.every(sub => sub.every(ele => (typeof ele === 'object' && ele !== null && ele['K'] === 'CONCRETE')));
   } else if (eleParam === 'NEC-EVERY-NOT-OBJECT-CONCRETE') {
@@ -279,8 +277,7 @@ function toPush(accParam, stackParam) {
   if (accParam === null || typeof accParam !== 'object') {
     stackParam.forEach(sub => sub.push(accParam));
   } else if (Array.isArray(accParam)) {
-    let copiesAndOriginal = stackParam.map((_, idx) => (idx === 0 ? accParam : accParam.slice())).reverse();
-    stackParam.forEach(sub => sub.push(...copiesAndOriginal));
+    stackParam.forEach(sub => sub.push(accParam));
   } else {
     let counterpartsAndOriginal = stackParam.map((_, idx) => (idx === 0 ? accParam : Object.assign({}, accParam))).reverse();
     stackParam.forEach((sub, idx) => {
@@ -301,13 +298,17 @@ function toPop(stackParam) {
     if (idx !== (stackParam['length'] - 1)) {
       if (sub[sub['length'] - 1] === null || typeof sub[sub['length'] - 1] !== 'object') {
         sub.pop();
-      } else if (typeof sub[sub['length'] - 1] === 'object') {
+      } else if (Array.isArray(sub[sub['length'] - 1])) {
+        sub.pop();
+      } else {
         stackParam.forEach(_ => sub.pop());
       }
     } else {
       if (sub['length'] === 0 || sub[sub['length'] - 1] === null || typeof sub[sub['length'] - 1] !== 'object') {
         result = sub.pop();
-      } else if (typeof sub[sub['length'] - 1] === 'object') {
+      } else if (Array.isArray(sub[sub['length'] - 1])) {
+        result = sub.pop();
+      } else {
         stackParam.forEach((_, jdx) => {
           if (jdx === 0) {
             result = sub.pop();

@@ -21,26 +21,23 @@ If one likes, one can think of this in the following way. For simplicity, assume
 
 - 'PUSH':  
   - If a null or primitive value is pushed from the register, that value gets copied into every sub-stack. The value stays in the register.
-  - If an array is pushed from the register, then
-    - first, _n - 1_ (shallow) copies of the value are made,
-    - second, all _n_ arrays are placed into each sub-stack such that the original is the topmost, and
-    - third, the original value also remains in the register.
+  - If an array is pushed from the register, then that array gets placed into each sub-stack.
   - If an object (excludes arrays) is pushed from the register, then
     - first, _n - 1_ (shallow) copies of the value are made,
     - second, the K property is determined by user's input.
     - third, all _n_ objects are placed into each sub-stack such that the original is the topmost, and
     - fourth, the original value also remains in the register.
 - 'POP':
-  - If a null or primitive value is the topmost value of the topmost sub-stack, the value is removed from each of the sub-stacks and placed into the register.
-  - If an object (includes arrays) is the topmost value of the topmost sub-stack,
+  - If a null, primitive or array value is the topmost value of the topmost sub-stack, the value is removed from each of the sub-stacks and placed into the register.
+  - If an object (excludes arrays) is the topmost value of the topmost sub-stack,
     - the value is placed into the register, and
     - the value _and_ all of its counterparts are removed from each of the sub-stacks.
   - If the topmost item of the topmost sub-stack is empty, `undefined` is placed into the register (i.e., it is possible to work with stacks of length 0).
 
 All of the operations in the next section also perform a sort of popping operation, but it is slightly different from the one above. Whenever I write "Pop off the topmost value", I mean:
 
-- If a primitive value is the topmost value, the value is removed from each of the sub-stacks.
-- If an object (includes arrays) is the topmost value, the value _and_ all of its counterparts are removed from each of the sub-stacks.
+- If a null, primitive, or array value is the topmost value, the value is removed from each of the sub-stacks.
+- If an object (excludes arrays) is the topmost value, the value _and_ all of its counterparts are removed from each of the sub-stacks.
 - If the topmost item is empty, although the item does not have `undefined` in it, `undefined` becomes an operand for the operator.
 
 ## Logical Operations for Topmost Item in the Topmost Sub-Stack ##
@@ -87,20 +84,20 @@ Examples:
     - Pop off the topmost value,
     - Check `value === register`, and
     - Store result in register
-- 'OBJECT-EXISTS': (short for 'value is a non-empty, non-null object')
+- 'OBJECT-EXISTS': (short for 'value is a non-null object with at least one property that is neither `null`, `undefined`, nor `NaN`')
   - From the topmost sub-stack,
     - Pop off the topmost value,
-    - Check `(typeof value === 'object' && value !== null && Object.keys(value)['length'] > 0)`, and
+    - Check `(typeof value === 'object' && value !== null && Object.values(value).some(ele => ele !== null && ele !== undefined && !Number.isNaN(ele)))`, and
     - Store result in register
 - 'OBJECT-CONCRETE': (short for 'value is a concrete, non-null object')
   - From the topmost sub-stack,
     - Pop off the topmost value,
     - Check `(typeof value === 'object' && value !== null && value['K'] === 'CONCRETE')`, and
     - Store result in register
-- 'PRIME-EXISTS': (short for 'value is neither an object nor `NaN`)
+- 'PRIME-EXISTS': (short for 'value is neither an object, `undefined`, nor `NaN`)
   - From the topmost sub-stack,
     - Pop off the topmost value,
-    - Check `(typeof value !== 'object' && !Number.isNaN(value))`, and
+    - Check `(typeof value !== 'object' && value !== undefined && !Number.isNaN(value))`, and
     - Store result in register
 
 ## Logical Operations Across All Items in the Topmost Sub-Stack ##
@@ -150,11 +147,11 @@ Examples:
     - Store result in register
 - 'EVERY-OBJECT-EXISTS':
   - For the topmost sub-stack,
-    - Check, `.every(ele => (typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0))` and
+    - Check, `.every(ele => (typeof ele === 'object' && ele !== null && Object.values(ele).some(val => val !== null && val !== undefined && !Number.isNaN(val)))` and
     - Store result in register
-- 'EVERY-NOT-OBJECT-EXISTS': (short for 'every value is either not an object, null, or empty')
+- 'EVERY-NOT-OBJECT-EXISTS': (short for 'every value is either not an object, null, or fails to have a genuine property')
   - For the topmost sub-stack,
-    - Check, `.every(ele => !(typeof ele === 'object' && ele !== null && Object.keys(ele)['length'] > 0))` and
+    - Check, `.every(ele => !(typeof ele === 'object' && ele !== null && Object.values(ele).some(val => val !== null && val !== undefined && !Number.isNaN(val)))` and
     - Store result in register
 - 'EVERY-OBJECT-CONCRETE':
   - From the topmost sub-stack,
@@ -166,11 +163,11 @@ Examples:
     - Store result in register
 - 'EVERY-PRIME-EXISTS':
   - From the topmost sub-stack,
-    - Check `.every(ele => (typeof value !== 'object' && !Number.isNaN(value)))` and
+    - Check `.every(ele => (typeof value !== 'object' && value !== undefined && !Number.isNaN(value)))` and
     - Store result in register
-- 'EVERY-NOT-PRIME-EXISTS': (short for 'every value is either an object or `NaN`')
+- 'EVERY-NOT-PRIME-EXISTS': (short for 'every value is either an object, `undefined` or `NaN`')
   - From the topmost sub-stack,
-    - Check `.every(ele => !(typeof value !== 'object' && !Number.isNaN(value)))` and
+    - Check `.every(ele => !(typeof value !== 'object' && value !== undefined && !Number.isNaN(value)))` and
     - Store result in register
 
 The corresponding operations where 'EVERY' is replaced with 'SOME' are also available.
@@ -179,9 +176,9 @@ The corresponding operations where 'EVERY' is replaced with 'SOME' are also avai
 
 Examples:
 
-- '`any non-object, non-NaN value` PUSH `any non-object, non-NaN value` PUSH PUSH PUSH EVERY-PRIME-EXISTS' // => true
+- '`any non-object, non-undefined, non-NaN value` PUSH `any non-object, non-undefined, non-NaN value` PUSH PUSH PUSH EVERY-PRIME-EXISTS' // => true
   - [continuation code:] 'PRIME-EXISTS' // => true
-- '`any non-null object with length greater than 0` PUSH EVERY-OBJECT-EXISTS' // true
+- '`any non-null object with genuine property` PUSH EVERY-OBJECT-EXISTS' // true
   - [continuation code:] 'OBJECT-EXISTS' // => true
 - '`stacks are length 0` EVERY-PRIME-EXISTS' // => true
 - '`stacks are length 0` EVERY-OBJECT-EXISTS' // => true
