@@ -8,7 +8,7 @@ Programs are supplied to the language via a string. Each of the operations detai
 
 ## Register-only Operations ##
 
-- 'X': Place any "stringified" JS value, 'X', into the register.
+- 'X': Place any "stringified" JS value, 'X', into the register. The value may not contain whitespace as whitespaces are part of the syntax of the higher-order stack-and-register language.
 
 - 'BOOL': Booleanizes the register value.
 - 'NOT': Negates the register value and returns the result to the register.
@@ -175,6 +175,19 @@ Examples:
 
 The corresponding operations where 'EVERY' is replaced with 'SOME' are also available.
 
+=====================================================================================
+
+Examples:
+
+- '`any non-object, non-NaN value` PUSH `any non-object, non-NaN value` PUSH PUSH PUSH EVERY-PRIME-EXISTS' // => true
+  - [continuation code:] 'PRIME-EXISTS' // => true
+- '`any non-null object with length greater than 0` PUSH EVERY-OBJECT-EXISTS' // true
+  - [continuation code:] 'OBJECT-EXISTS' // => true
+- '`stacks are length 0` EVERY-PRIME-EXISTS' // => true
+- '`stacks are length 0` EVERY-OBJECT-EXISTS' // => true
+
+=====================================================================================
+
 ## Logical Operations Across All Sub-Stacks ##
 
 - 'NEC-EVERY-OBJECT-CONCRETE': (short for 'necessarily, every value is a concrete, non-null object')
@@ -224,6 +237,5 @@ miniLogLang('true PUSH true PUSH false NOT PUSH SOME-BCON PRINT SOME-NOT-BCON PR
 miniLogLang('undefined PUSH null PUSH EVERY-NOT-TRUE PRINT true EVERY-NOT-AND PRINT SOME-AND NOT PRINT'); // => true, true, true
 miniLogLang('false PUSH true PUSH ID PRINT TRU NOT PRINT'); // => true, true
 miniLogLang('false PUSH +0 PUSH NaN PUSH NaN PUSH ID PRINT SOME-PRIM-EXISTS PRINT CON PRINT EVERY-PRIM-EXISTS PRINT'); // => false, true, true, true
-miniLogLang('EVERY-OBJECT-EXISTS PRINT EVERY-PRIM-EXISTS PRINT'); // => true, true
 miniLogLang('SOME-OBJECT-EXISTS PRINT SOME-PRIM-EXISTS PRINT'); // => false, false
 -->
