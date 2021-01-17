@@ -178,10 +178,16 @@ Examples:
 
 - '`any non-object, non-undefined, non-NaN value` PUSH `any non-object, non-undefined, non-NaN value` PUSH PUSH PUSH EVERY-PRIME-EXISTS' // => true
   - [continuation code:] 'PRIME-EXISTS' // => true
-- '`any non-null object with genuine property` PUSH EVERY-OBJECT-EXISTS' // true
+- '`any non-null object with genuine property` PUSH EVERY-OBJECT-EXISTS' // => true
   - [continuation code:] 'OBJECT-EXISTS' // => true
 - '`stacks are length 0` EVERY-PRIME-EXISTS' // => true
 - '`stacks are length 0` EVERY-OBJECT-EXISTS' // => true
+- '`stacks are length 0` SOME-PRIME-EXISTS NOT' // => true
+- '`stacks are length 0` SOME-OBJECT-EXISTS NOT' // => true
+- '`any non-object, non-undefined, non-NaN value` PUSH `any non-object, non-undefined, non-NaN value` PUSH PUSH PUSH EVERY-OBJECT-EXISTS NOT' // => true
+- '`any non-object, non-undefined, non-NaN value` PUSH `any non-object, non-undefined, non-NaN value` PUSH PUSH PUSH SOME-NOT-OBJECT-EXISTS' // => true
+- '`any non-null object with genuine property` PUSH EVERY-OBJECT-EXISTS' // => true
+  - [continuation code:] 'SOME-NOT-OBJECT-EXISTS NOT' // true
 
 =====================================================================================
 
@@ -219,20 +225,9 @@ Given the way the program is structured, it is interesting to point out that if 
 
 <!--
 Test Cases :
-
-miniLogLang('PRINT'); // => false
-miniLogLang('NOT NOT PRINT') // => false
-miniLogLang('5 PUSH 3 AND PRINT'); // => true
-miniLogLang('5 PRINT NOT PUSH 3 PRINT NOT OR PRINT'); // => true, true, false
-miniLogLang('5 PUSH POP PRINT'); // => true
-miniLogLang('5 PUSH PRINT'); // => true
 miniLogLang("[0] PUSH {P: 2, K: 'concrete'} PUSH 0 PUSH PRINT EVERY-NOT-OBJECT-EXISTS PRINT POP PRINT EVERY-OBJECT-EXISTS PRINT SOME-OBJECT-CONCRETE PRINT"); // => false, true, false, true, true
-miniLogLang('6 PUSH'); // => n/a
-miniLogLang('PROOF PRINT'); // => true
+
 miniLogLang("1 OR PRINT PUSH ['b'] PUSH SOME-ID PRINT ['b'] SOME-ID PRINT NOT PRINT"); // => true, true, false, true
-miniLogLang('true PUSH true PUSH false NOT PUSH SOME-BCON PRINT SOME-NOT-BCON PRINT POP NOT PUSH SOME-NOT-BCON PRINT EVERY-NOT-BCON PRINT'); // => true, false, true, false
-miniLogLang('undefined PUSH null PUSH EVERY-NOT-TRUE PRINT true EVERY-NOT-AND PRINT SOME-AND NOT PRINT'); // => true, true, true
-miniLogLang('false PUSH true PUSH ID PRINT TRU NOT PRINT'); // => true, true
+
 miniLogLang('false PUSH +0 PUSH NaN PUSH NaN PUSH ID PRINT SOME-PRIM-EXISTS PRINT CON PRINT EVERY-PRIM-EXISTS PRINT'); // => false, true, true, true
-miniLogLang('SOME-OBJECT-EXISTS PRINT SOME-PRIM-EXISTS PRINT'); // => false, false
 -->
