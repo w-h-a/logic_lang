@@ -67,15 +67,15 @@ All of the operations in the next section also perform a sort of popping operati
 
 Examples:
 
-- '`anyvalue` PUSH CON' // => true
-- '`falsy` BOOL NOT' // => true
-- '`truthy` PUSH `anyvalue` OR' // => true
-- '`truthy` NOT PUSH `anyvalue` CON' // => true
-- '`truthy` PUSH `truthy` CON' // => true
-- '`falsy` PUSH `anyvalue` CON' // true
-- '`truthy` PUSH BCON' // => true
-- '`falsy` PUSH BCON' // => true
-- '`truthy` PUSH `falsy` NOT AND PUSH NOT CON NOT' // => true
+- '`any value` PUSH CON' // => true
+- '`any falsy` BOOL NOT' // => true
+- '`any truthy` PUSH `any value` OR' // => true
+- '`any truthy` NOT PUSH `any value` CON' // => true
+- '`any truthy` PUSH `any truthy` CON' // => true
+- '`any falsy` PUSH `any value` CON' // true
+- '`any truthy` PUSH BCON' // => true
+- '`any falsy` PUSH BCON' // => true
+- '`any truthy` PUSH `any falsy` NOT AND PUSH NOT CON NOT' // => true
 
 =====================================================================================
 
@@ -176,18 +176,28 @@ The corresponding operations where 'EVERY' is replaced with 'SOME' are also avai
 
 Examples:
 
-- '`any non-object, non-undefined, non-NaN value` PUSH `any non-object, non-undefined, non-NaN value` PUSH PUSH PUSH EVERY-PRIME-EXISTS' // => true
+- '`any non-object, non-undefined, non-NaN` PUSH `any non-object, non-undefined, non-NaN` PUSH PUSH PUSH EVERY-PRIME-EXISTS' // => true
   - [continuation code:] 'PRIME-EXISTS' // => true
 - '`any non-null object with genuine property` PUSH EVERY-OBJECT-EXISTS' // => true
   - [continuation code:] 'OBJECT-EXISTS' // => true
 - '`stacks are length 0` EVERY-PRIME-EXISTS' // => true
 - '`stacks are length 0` EVERY-OBJECT-EXISTS' // => true
-- '`stacks are length 0` SOME-PRIME-EXISTS NOT' // => true
-- '`stacks are length 0` SOME-OBJECT-EXISTS NOT' // => true
-- '`any non-object, non-undefined, non-NaN value` PUSH `any non-object, non-undefined, non-NaN value` PUSH PUSH PUSH EVERY-OBJECT-EXISTS NOT' // => true
-- '`any non-object, non-undefined, non-NaN value` PUSH `any non-object, non-undefined, non-NaN value` PUSH PUSH PUSH SOME-NOT-OBJECT-EXISTS' // => true
+- '`stacks are length 0` SOME-NOT-PRIME-EXISTS NOT' // => true
+- '`stacks are length 0` SOME-NOT-OBJECT-EXISTS NOT' // => true
+- '`any non-null object with genuine property` PUSH EVERY-OBJECT-EXISTS' // => true
+  - [continuation code:] 'SOME-OBJECT-EXISTS' // => true
+- '`any non-object, non-undefined, non-NaN` PUSH `any non-object, non-undefined, non-NaN` PUSH PUSH PUSH EVERY-OBJECT-EXISTS NOT' // => true
+- '`any non-object, non-undefined, non-NaN` PUSH `any non-object, non-undefined, non-NaN` PUSH PUSH PUSH SOME-NOT-OBJECT-EXISTS' // => true
+- '`any non-null object with genuine property` PUSH SOME-PRIME-EXISTS NOT' // => true
+  - [continuation code:] 'EVERY-NOT-PRIME-EXISTS' // => true
 - '`any non-null object with genuine property` PUSH EVERY-OBJECT-EXISTS' // => true
   - [continuation code:] 'SOME-NOT-OBJECT-EXISTS NOT' // true
+- '`any truthy` PUSH PUSH EVERY-AND' // => true
+  - [continuation code:] 'EVERY-BCON' // => true
+- '`any falsy` PUSH PUSH SOME-AND NOT' // => true
+  - [continuation code:] 'NOT EVERY-BCON' // => true
+- '`any falsy` PUSH PUSH SOME-AND NOT' // => true
+  - [continuation code:] 'EVERY-BCON NOT' // => true 
 
 =====================================================================================
 
