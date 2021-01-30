@@ -107,10 +107,14 @@ Examples (and remarks):
 /* Note to self: I like here that non-existence implies non-identity: */
 - `NaN` PUSH PRIME-EXISTS // => false
 - `NaN` PUSH ID // false
+
 /* Note to self: I wish that would be the case for the following as well: */
+
 - `undefined` PUSH ID // => true
 - `undefined` PUSH PRIME-EXISTS // => false
+
 /* Note to self: I wish it would be the case for the following as well, but perhaps there are genuine properties that the following arrays have (e.g., length): */
+
 - `[null]` PUSH ID // => true
 - `[null]` PUSH OBJECT-EXISTS // => false
 - `[]` PUSH ID // => true
